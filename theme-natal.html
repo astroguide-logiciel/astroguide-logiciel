@@ -154,6 +154,13 @@
   footer{margin-top:34px; color:var(--muted); font-size:12px; line-height:1.7}
   footer a{color:var(--brass)}
   @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+  /* ---- Adaptation à l'iframe : éviter tout débordement horizontal ---- */
+  .grid > *{ min-width:0; }                 /* les colonnes peuvent rétrécir sous la largeur du contenu */
+  #results, #dignitiesBody, #aspectsBody{   /* tableaux larges : défilement interne au lieu de coupe */
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  #results table, #dignitiesBody table, #aspectsBody table{ min-width:max-content; }
 </style>
 </head>
 <body>
