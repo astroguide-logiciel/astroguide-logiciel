@@ -284,10 +284,12 @@
   </div>
 
   <footer>
-    Calculs par la <a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a>
-    (Astrodienst AG), compilée en WebAssembly — précision à la seconde d'arc, dates ≈ 1800–2400.
-    Licence Swiss Ephemeris : AGPL/GPL (usage libre avec partage du code) ou licence commerciale d'Astrodienst.
-    Tout le calcul s'effectue localement dans votre navigateur ; aucune donnée n'est envoyée.
+    Calculs réalisés par la <a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a>
+    © Astrodienst AG (Dieter Koch, Alois Treindl), compilée en WebAssembly — précision à la seconde d'arc, dates ≈ 1800–2400.
+    Tout le calcul s'effectue localement dans votre navigateur ; aucune donnée de naissance n'est transmise.
+    Ce calculateur est distribué sous licence
+    <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a> —
+    <a href="https://github.com/astroguide-logiciel/astroguide-logiciel" target="_blank" rel="noopener">code source</a>.
   </footer>
 </div>
 
@@ -1125,6 +1127,26 @@ $('#example').addEventListener('click', () => {
   cityResults.hidden = true;
   if (ready) $('#calc').click();
 });
+</script>
+<script>
+/* Astroguide : communique la hauteur du calculateur à la page qui l'intègre en iframe. */
+(function () {
+  function post() {
+    var h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body ? document.body.scrollHeight : 0
+    );
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ agHeight: h }, '*');
+    }
+  }
+  window.addEventListener('load', post);
+  window.addEventListener('resize', post);
+  if (window.ResizeObserver && document.body) {
+    new ResizeObserver(post).observe(document.body);
+  }
+  setTimeout(post, 300);
+})();
 </script>
 </body>
 </html>
