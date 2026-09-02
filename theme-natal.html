@@ -185,6 +185,11 @@
       <h2 id="in-title">Données de naissance</h2>
       <p class="sub">Heure locale de naissance et décalage horaire de ce lieu à cette date.</p>
 
+      <div class="field">
+        <label for="name">Nom (facultatif)</label>
+        <input type="text" id="name" placeholder="Prénom, nom ou libellé du thème" autocomplete="off">
+      </div>
+
       <div class="row">
         <div class="field">
           <label for="date">Date</label>
@@ -224,21 +229,9 @@
       </div>
       <div class="hint" style="margin:-8px 0 16px">Degrés décimaux. Négatif = Sud (latitude) ou Ouest (longitude).</div>
 
-      <div class="field">
-        <label>Orbes des aspects (°)</label>
-        <div class="orbs">
-          <div class="of"><div class="oglyph" title="Conjonction">☌</div><input type="number" id="orbConj" value="8" step="0.5" min="0" max="12" aria-label="Orbe conjonction"></div>
-          <div class="of"><div class="oglyph" title="Sextile">⚹</div><input type="number" id="orbSext" value="4" step="0.5" min="0" max="12" aria-label="Orbe sextile"></div>
-          <div class="of"><div class="oglyph" title="Carré">□</div><input type="number" id="orbSqua" value="6" step="0.5" min="0" max="12" aria-label="Orbe carré"></div>
-          <div class="of"><div class="oglyph" title="Trigone">△</div><input type="number" id="orbTrig" value="6" step="0.5" min="0" max="12" aria-label="Orbe trigone"></div>
-          <div class="of"><div class="oglyph" title="Opposition">☍</div><input type="number" id="orbOppo" value="8" step="0.5" min="0" max="12" aria-label="Orbe opposition"></div>
-        </div>
-        <div class="hint">Conjonction · sextile · carré · trigone · opposition. Ajustez pour coller à votre logiciel de référence.</div>
-      </div>
-
       <div class="actions">
         <button class="btn btn-primary" id="calc">Calculer le thème</button>
-        <button class="btn btn-ghost" id="example" title="Charger un exemple">Exemple</button>
+        <button class="btn btn-ghost" id="now" title="Position et heure actuelles à Paris">Maintenant</button>
       </div>
       <div id="status" role="status">Chargement du moteur Swiss Ephemeris…</div>
     </section>
@@ -248,7 +241,6 @@
       <h2 id="wheel-title">Carte du ciel</h2>
       <p class="sub">Zodiaque tropical · maisons Placidus · ascendant à gauche · aspects majeurs tracés.</p>
       <div class="wheel-wrap" id="wheel"></div>
-      <div class="legend" id="wheelLegend"></div>
     </section>
   </div><!-- /.grid -->
 
@@ -521,8 +513,8 @@ timeEl.addEventListener('input', (e) => {
 
 /* ---------- Lecture des orbes ---------- */
 function readOrbs(){
-  const g = (id, def) => { const v = parseFloat($(id).value); return Number.isFinite(v) && v >= 0 ? v : def; };
-  return { conj:g('#orbConj',8), sext:g('#orbSext',4), squa:g('#orbSqua',6), trig:g('#orbTrig',6), oppo:g('#orbOppo',8) };
+  // Orbes fixes (le réglage manuel a été retiré du formulaire pour rester simple).
+  return { conj:8, sext:4, squa:6, trig:6, oppo:8 };
 }
 
 /* ---------- Aspects : phase applicative / séparative ---------- */
@@ -615,7 +607,7 @@ function computeChart(){
   const aspects = computeAspects(bodies, orbs);
 
   return {
-    input:{ y, mo, da, hh, mi, tz, lat, lon },
+    input:{ name:($('#name').value||'').trim(), y, mo, da, hh, mi, tz, lat, lon },
     jd, asc, mc, orbs, isDay, almutenCuspsP,
     cusps:  cuspsP.slice(1, 13),
     cuspsP: cuspsP.slice(1, 13),
@@ -758,6 +750,7 @@ function renderAspects(c){
 /* ---------- Légende de la roue ---------- */
 function renderLegend(){
   const el = $('#wheelLegend');
+  if (!el) return;
   const drawn = ASPECTS.filter(a => a.draw);
   el.innerHTML = drawn.map(a => {
     const style = `border-top-color:${a.color};border-top-style:${a.dash ? 'dashed' : 'solid'}`;
@@ -896,7 +889,7 @@ function renderWheel(c){
     s += dot(tl, R_asp, 2, 'fill:var(--brass)');                                         // ancre d'aspect
     s += txt(dl, R_planet, b.glyph, 34, 'fill:var(--brass)');
     const p = splitDeg(b.lon);
-    s += txt(dl, R_pdeg, `${p.d}°${SIGN_GLYPH[p.signIdx]}${b.retro ? '℞' : ''}`, 9,
+    s += txt(dl, R_pdeg, `${p.d}°${b.retro ? '℞' : ''}`, 9,
              `fill:${b.retro ? 'var(--rust)' : 'var(--muted)'}`);
   });
 
@@ -913,6 +906,7 @@ function buildText(c){
   const date = `${String(i.da).padStart(2,'0')}/${String(i.mo).padStart(2,'0')}/${i.y}`;
   const time = `${String(i.hh).padStart(2,'0')}:${String(i.mi).padStart(2,'0')}`;
   let out = `THÈME NATAL\n`;
+  if (i.name) out += `${i.name}\n`;
   out += `${date}  ${time}  (UTC${tzStr})\n`;
   out += `Lieu : ${i.lat}, ${i.lon}\n`;
   out += `Zodiaque tropical - Maisons : Placidus (P) et Whole Sign (W)\n`;
@@ -966,7 +960,7 @@ function buildCsv(c){
     const p = splitDeg(cusp);
     rows.push([`WholeSign ${HOUSE_ROMAN[idx]}`, cusp.toFixed(6), SIGNS[p.signIdx], p.d, p.m, p.s, '', '', '', '']);
   });
-  let out = rows.map(r => r.join(',')).join('\n');
+  let out = (c.input.name ? 'Nom,'+c.input.name+'\n\n' : '') + rows.map(r => r.join(',')).join('\n');
 
   // Second bloc : aspects
   out += `\n\nASPECTS\n`;
@@ -1134,13 +1128,36 @@ function selectCity(r){
 $('#cityBtn').addEventListener('click', searchCity);
 $('#city').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); searchCity(); } });
 
-// Exemple (Paris, 15/05/1990)
-$('#example').addEventListener('click', () => {
-  $('#date').value = '15/05/1990'; $('#time').value = '14:30'; $('#tz').value = '2';
-  $('#lat').value = '48.8566'; $('#lon').value = '2.3522'; $('#city').value = 'Paris, Île-de-France';
-  cityResults.hidden = true;
+// Bouton « Maintenant » : remplit le formulaire avec la date et l'heure du jour, à Paris.
+function fillNow(){
+  const now = new Date();
+  const TZ = 'Europe/Paris';
+  const parts = {};
+  new Intl.DateTimeFormat('fr-FR', { timeZone:TZ, year:'numeric', month:'2-digit',
+    day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false })
+    .formatToParts(now).forEach(p => { parts[p.type] = p.value; });
+  const hh = parts.hour === '24' ? '00' : parts.hour;
+  $('#date').value = `${parts.day}/${parts.month}/${parts.year}`;
+  $('#time').value = `${hh}:${parts.minute}`;
+  $('#lat').value = '48.8566';
+  $('#lon').value = '2.3522';
+  $('#city').value = 'Paris, France';
+  try {
+    const off = tzOffsetHours(TZ, +parts.year, +parts.month, +parts.day, +hh, +parts.minute);
+    $('#tz').value = off;
+  } catch (e){ $('#tz').value = 1; }
+  if (cityResults) cityResults.hidden = true;
+  if (cityHint) cityHint.textContent = 'Position et heure actuelles à Paris. Modifiable.';
+}
+
+$('#now').addEventListener('click', () => {
+  fillNow();
   if (ready) $('#calc').click();
 });
+
+// Au chargement : afficher d'emblée le ciel de « maintenant » sur Paris.
+fillNow();
+if (ready) $('#calc').click();
 </script>
 <script>
 /* Astroguide : communique la hauteur du calculateur à la page qui l'intègre en iframe. */
