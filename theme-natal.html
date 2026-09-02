@@ -161,6 +161,12 @@
     overflow-x:auto; -webkit-overflow-scrolling:touch;
   }
   #results table, #dignitiesBody table, #aspectsBody table{ min-width:max-content; }
+
+  /* ---- Disposition : haut (formulaire + roue) puis résultats pleine largeur ---- */
+  .results-full{ margin-top:22px; }
+  .results-full .card + .card{ margin-top:22px; }
+  /* Avant calcul (roue masquée), le formulaire n'occupe pas toute la largeur */
+  .grid:has(#wheelCard[hidden]){ grid-template-columns:minmax(320px,440px); }
 </style>
 </head>
 <body>
@@ -237,15 +243,17 @@
       <div id="status" role="status">Chargement du moteur Swiss Ephemeris…</div>
     </section>
 
-    <!-- ============ RÉSULTATS ============ -->
-    <div>
-      <section class="card" id="wheelCard" aria-labelledby="wheel-title" hidden>
-        <h2 id="wheel-title">Carte du ciel</h2>
-        <p class="sub">Zodiaque tropical · maisons Placidus · ascendant à gauche · aspects majeurs tracés.</p>
-        <div class="wheel-wrap" id="wheel"></div>
-        <div class="legend" id="wheelLegend"></div>
-      </section>
+    <!-- ============ CARTE DU CIEL (haut, colonne droite) ============ -->
+    <section class="card" id="wheelCard" aria-labelledby="wheel-title" hidden>
+      <h2 id="wheel-title">Carte du ciel</h2>
+      <p class="sub">Zodiaque tropical · maisons Placidus · ascendant à gauche · aspects majeurs tracés.</p>
+      <div class="wheel-wrap" id="wheel"></div>
+      <div class="legend" id="wheelLegend"></div>
+    </section>
+  </div><!-- /.grid -->
 
+  <!-- ============ RÉSULTATS (pleine largeur) ============ -->
+  <div class="results-full">
       <section class="card" aria-labelledby="out-title">
         <h2 id="out-title">Positions</h2>
         <p class="sub">Zodiaque tropical · nœuds en position vraie.</p>
@@ -287,8 +295,7 @@
           <button class="btn" id="dlBtn">Télécharger</button>
         </div>
       </section>
-    </div>
-  </div>
+  </div><!-- /.results-full -->
 
   <footer>
     Calculs réalisés par la <a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a>
