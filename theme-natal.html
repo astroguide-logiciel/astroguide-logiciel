@@ -6,7 +6,7 @@
 <title>Thème natal — calculateur de précision</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Symbols:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     /* Charte Astroguide.net — thème clair. Noms de variables conservés (le JS les utilise). */
@@ -16,6 +16,7 @@
     --parch:#181316; --muted:#6B6460; --teal:#1F7A4D; --rust:#B4552E;
     --display:'Spectral',Georgia,serif; --ui:'Inter',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
     --radius:14px;
+    --sym:'Noto Sans Symbols','Segoe UI Symbol','Apple Symbols',sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -107,7 +108,7 @@
       text-transform:uppercase; color:var(--muted); padding:0 10px 10px; border-bottom:1px solid var(--line)}
   td{padding:9px 10px; border-bottom:1px solid var(--line-soft); white-space:nowrap}
   tr:last-child td{border-bottom:none}
-  .glyph{font-size:17px; color:var(--brass); width:1.4em}
+  .glyph{font-size:17px; color:var(--brass); width:1.4em; font-family:var(--sym)}
   .pos{color:var(--parch)}
   .sign{color:var(--muted)}
   .retro{color:var(--rust); font-weight:600}
@@ -127,9 +128,9 @@
   .section-label::after{content:""; flex:1; height:1px; background:var(--line-soft)}
 
   /* ---- Aspects ---- */
-  .asp-glyph{display:inline-block; width:1.2em; text-align:center; font-size:15px}
+  .asp-glyph{display:inline-block; width:1.2em; text-align:center; font-size:15px; font-family:var(--sym)}
   td.orb{color:var(--parch); text-align:right}
-  .body-glyph{font-size:16px; color:var(--brass); margin-right:5px}
+  .body-glyph{font-size:16px; color:var(--brass); margin-right:5px; font-family:var(--sym)}
   .phase-app{color:var(--teal)}
   .phase-sep{color:var(--muted)}
   .phase-exact{color:var(--brass); font-weight:600}
@@ -297,6 +298,7 @@
     <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a> —
     <a href="https://github.com/astroguide-logiciel/astroguide-logiciel" target="_blank" rel="noopener">code source</a>.
     <br>Symboles des signes : <a href="https://tabler.io/icons" target="_blank" rel="noopener">Tabler Icons</a> (licence MIT).
+    <br>Symboles des planètes : <a href="https://fonts.google.com/noto/specimen/Noto+Sans+Symbols" target="_blank" rel="noopener">Noto Sans Symbols</a> (licence OFL).
   </footer>
 </div>
 
@@ -916,7 +918,7 @@ function renderWheel(c){
     s += dot(tl, R_mark, 2.8, 'fill:var(--brass-bright)');                               // point de position (extérieur du zodiaque)
     s += seg(tl, R_zin, tl, R_asp, 'stroke:var(--line-soft);stroke-width:1;opacity:.6'); // radiale interne vers l'ancre d'aspect
     s += dot(tl, R_asp, 2, 'fill:var(--brass)');                                         // ancre d'aspect
-    s += txt(dl, R_planet, b.glyph, 34, 'fill:var(--brass)');
+    s += txt(dl, R_planet, b.glyph, 34, 'fill:var(--brass);font-family:var(--sym)');
     const p = splitDeg(b.lon);
     s += txt(dl, R_pdeg, `${p.d}°${b.retro ? '℞' : ''}`, 9,
              `fill:${b.retro ? 'var(--rust)' : 'var(--muted)'}`);
