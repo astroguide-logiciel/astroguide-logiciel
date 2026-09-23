@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demeures & maisons lunaires — Astroguide.net</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rouge:#A81C24; --rouge-fonce:#7E1017; --rouge-clair:#F5E5E6;
+    --encre:#181316; --gris:#6B6460; --gris-clair:#9A938F;
+    --trait:#E9E0E0; --surface:#FBF8F8; --vert:#1f7a4d; --vert-clair:#e6f2ec;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#fff; color:var(--encre);
+       font-family:'Inter',system-ui,-apple-system,sans-serif; line-height:1.55}
+  .wrap{max-width:1000px; margin:0 auto; padding:26px 20px 60px}
+  h1{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:clamp(24px,3.4vw,34px); margin:0 0 .2em}
+  .lede{color:var(--gris); font-size:14.5px; margin:0 0 14px; max-width:70ch}
+  .note{background:var(--surface); border:1px solid var(--trait); border-left:3px solid var(--rouge);
+        border-radius:10px; padding:12px 15px; font-size:13.5px; color:var(--encre); margin:0 0 24px; max-width:70ch}
+
+  .status{color:var(--gris); font-size:14px; padding:8px 0}
+  .status.err{color:var(--rouge)}
+
+  .today{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:0 0 26px}
+  @media(max-width:620px){.today{grid-template-columns:1fr}}
+  .tcard{border:1px solid var(--trait); border-radius:14px; overflow:hidden; background:#fff}
+  .tcard .head{background:var(--rouge-clair); padding:14px 16px; display:flex; align-items:baseline; gap:10px}
+  .tcard .head.accent{background:var(--rouge)}
+  .tcard .head.accent *{color:#fff}
+  .tcard .num{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:30px; color:var(--rouge); line-height:1}
+  .tcard .lab{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--gris)}
+  .tcard .body{padding:14px 16px; font-size:14px}
+  .tcard .ctx{color:var(--gris)}
+
+  .bar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:8px 0 14px; flex-wrap:wrap}
+  .bar .mois{font-family:'Spectral',Georgia,serif; font-size:20px; font-weight:600; text-transform:capitalize}
+  .nav{display:flex; gap:8px}
+  .nav button, .util{border:1px solid var(--trait); background:#fff; color:var(--encre);
+     border-radius:9px; padding:8px 12px; font-family:inherit; font-size:13.5px; cursor:pointer}
+  .nav button:hover{border-color:var(--rouge); color:var(--rouge)}
+  .util{display:inline-flex; align-items:center; gap:8px; user-select:none}
+  .util input{accent-color:var(--rouge)}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:22px}
+  @media(max-width:760px){.cols{grid-template-columns:1fr}}
+  .col h2{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:18px; margin:0 0 8px}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  th{text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--gris);
+     font-weight:600; padding:0 8px 8px; border-bottom:1px solid var(--trait)}
+  td{padding:9px 8px; border-bottom:1px solid var(--surface); vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  .n{font-family:'Spectral',Georgia,serif; font-weight:600; color:var(--rouge); font-size:16px; width:2.2em}
+  .dt{white-space:nowrap; color:var(--encre); font-variant-numeric:tabular-nums}
+  .badge{display:inline-block; font-size:12px; font-weight:600; border-radius:6px; padding:2px 9px}
+
+  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin:14px 0 0; font-size:12px; color:var(--gris)}
+  .legend .badge{font-size:11px}
+
+  footer{margin-top:30px; color:var(--gris); font-size:12px; line-height:1.7; border-top:1px solid var(--trait); padding-top:16px}
+  footer a{color:var(--rouge)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demeures &amp; maisons lunaires</h1>
+  <p class="lede">Deux lectures complémentaires de la Lune : sa <strong>demeure</strong> (position dans le zodiaque, 28 tranches égales de 12°51'26") et sa <strong>maison</strong> (place dans le cycle Soleil-Lune, de la Nouvelle à la Pleine Lune). Volguine classe les 28 maisons en quatre catégories : favorable, neutre, douteuse, mauvaise. Heures en fuseau de Paris.</p>
+  <p class="note">Selon Volguine, mieux vaut <strong>éviter de commencer une entreprise ou une démarche importante</strong> lorsque la Lune traverse une maison <strong>mauvaise</strong> ou <strong>douteuse</strong>, et profiter au contraire de son passage dans les maisons <strong>favorables</strong> ou <strong>neutres</strong>.</p>
+
+  <div id="status" class="status">Chargement du moteur Swiss Ephemeris…</div>
+
+  <div id="app" hidden>
+    <div class="today" id="today"></div>
+
+    <div class="bar">
+      <div class="nav">
+        <button id="prev" type="button">‹ Mois précédent</button>
+        <button id="next" type="button">Mois suivant ›</button>
+      </div>
+      <div class="mois" id="moisLabel"></div>
+      <label class="util"><input type="checkbox" id="utile"> Maisons favorables et neutres seulement</label>
+    </div>
+
+    <div class="cols">
+      <div class="col">
+        <h2>Demeures lunaires</h2>
+        <table><thead><tr><th>DL</th><th>Début</th></tr></thead>
+        <tbody id="tbodyDL"></tbody></table>
+      </div>
+      <div class="col">
+        <h2>Maisons lunaires</h2>
+        <table><thead><tr><th>ML</th><th>Début</th><th>Catégorie</th></tr></thead>
+        <tbody id="tbodyML"></tbody></table>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Calculs par la <a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a> © Astrodienst AG, effectués en local dans votre navigateur.
+    Découpage des demeures et des maisons lunaires, et catégorisation des maisons, d'après <em>Astrologie lunaire</em> d'Alexandre Volguine (éditions Dervy).
+    Les demeures suivent le zodiaque tropical ; les maisons, le cycle soli-lunaire (méthode « distance depuis la Nouvelle Lune »).
+    <br>Distribué sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a> — <a href="https://github.com/astroguide-logiciel/astroguide-logiciel" target="_blank" rel="noopener">code source</a>.
+  </footer>
+</div>
+
+<script type="module">
+import SwissEph from 'https://cdn.jsdelivr.net/npm/swisseph-wasm@0.1.0/src/swisseph.js';
+
+/* Catégories des maisons lunaires (Volguine) */
+const ML_CAT = {};
+[['mauvaise',[1,9,10,15,19,20,28]],
+ ['douteuse',[2,6,14,18,23,27]],
+ ['neutre',[3,4,5,11,16,21,24,25,26]],
+ ['favorable',[7,8,12,13,17,22]]].forEach(([c,arr])=>arr.forEach(n=>ML_CAT[n]=c));
+const CAT_COLOR = {
+  favorable:['#e6f2ec','#1f7a4d'],
+  neutre:   ['#FBF8F8','#6B6460'],
+  douteuse: ['#FBE7D6','#B4552E'],
+  mauvaise: ['#F5E5E6','#A81C24'],
+};
+function badge(cat){
+  const [bg,fg]=CAT_COLOR[cat];
+  return `<span class="badge" style="background:${bg};color:${fg}">${cat}</span>`;
+}
+
+const SIGNS=['Bélier','Taureau','Gémeaux','Cancer','Lion','Vierge','Balance','Scorpion','Sagittaire','Capricorne','Verseau','Poissons'];
+
+/* ---------- Moteur ---------- */
+let swe;
+const J1970 = 2440587.5;
+const jd = d => J1970 + d.getTime()/86400000;
+const norm = x => ((x % 360) + 360) % 360;
+const lonOf = (d, body) => norm(swe.calc(jd(d), body, swe.SEFLG_SWIEPH).longitude);
+const moonLon = d => lonOf(d, swe.SE_MOON);
+const sunLon  = d => lonOf(d, swe.SE_SUN);
+const elong   = d => norm(moonLon(d) - sunLon(d));
+const BINT = [8.5,17.5,27,37,47.5,58.5,70,82,94.5,107.5,121,135,149.5];
+
+function demeure(d){ return Math.floor(moonLon(d) / (360/28)) + 1; }
+function findNLs(start, end){
+  const res=[]; let t=start.getTime(); const step=6*3600*1000; let prev=elong(new Date(t));
+  while(t<end.getTime()){
+    const t2=t+step; const cur=elong(new Date(t2));
+    if(prev>300 && cur<60){
+      let lo=t, hi=t2;
+      for(let i=0;i<46;i++){ const mid=(lo+hi)/2; if(elong(new Date(mid))>180) lo=mid; else hi=mid; }
+      const dd=new Date(hi); res.push({date:dd, lon:sunLon(dd)});
+    }
+    prev=cur; t=t2;
+  }
+  return res;
+}
+function maison(d, nls){
+  const e=elong(d), m=moonLon(d);
+  if(e<=180){
+    const prev=nls.filter(n=>n.date<=d).pop(); if(!prev) return null;
+    const dd=norm(m - prev.lon); let k=1; for(const b of BINT){ if(dd>=b) k++; } return k;
+  } else {
+    const nxt=nls.find(n=>n.date>d); if(!nxt) return null;
+    const dd=norm(nxt.lon - m); let j=0; for(const b of BINT){ if(dd>=b) j++; } return 28-j;
+  }
+}
+function transitions(fn, start, end, stepMin=10){
+  const res=[]; let t=start.getTime(); let prev=fn(new Date(t)); const step=stepMin*60000;
+  while(t<end.getTime()){
+    const t2=t+step; const cur=fn(new Date(t2));
+    if(cur!==prev && cur!=null && prev!=null){
+      let lo=t, hi=t2;
+      for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(fn(new Date(mid))===prev) lo=mid; else hi=mid; }
+      res.push({date:new Date(hi), val:cur});
+    }
+    if(cur!=null) prev=cur;
+    t=t2;
+  }
+  return res;
+}
+
+/* ---------- Fuseau de Paris ---------- */
+const dtf = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+const parisDT = d => dtf.format(d).replace(', ', ' ');
+function parisYM(d){
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris', year:'numeric', month:'2-digit'}).formatToParts(d);
+  return { y:+p.find(x=>x.type==='year').value, m:+p.find(x=>x.type==='month').value };
+}
+const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+let cur = parisYM(new Date());
+let favNeutreOnly = false;
+function $(s){ return document.querySelector(s); }
+
+function renderToday(){
+  const now=new Date();
+  const nls=findNLs(new Date(now.getTime()-45*864e5), new Date(now.getTime()+45*864e5));
+  const dl=demeure(now), ml=maison(now, nls);
+  const ml_c=ML_CAT[ml];
+  const mlon=moonLon(now); const sIdx=Math.floor(mlon/30); const deg=Math.floor(mlon-30*sIdx);
+  const dlCard=`<div class="tcard"><div class="head"><span class="num">${dl}</span><span class="lab">Demeure du jour</span></div>
+     <div class="body"><span class="ctx">Lune à ${deg}° ${SIGNS[sIdx]}</span></div></div>`;
+  const mlCard=`<div class="tcard"><div class="head accent"><span class="num">${ml}</span><span class="lab">Maison du jour</span></div>
+     <div class="body">${badge(ml_c)}</div></div>`;
+  $('#today').innerHTML = dlCard + mlCard;
+}
+
+function monthWindow(y,m){
+  return { startUTC:new Date(Date.UTC(y, m-1, 1) - 2*864e5), endUTC:new Date(Date.UTC(y, m, 1) + 2*864e5) };
+}
+function renderMonth(){
+  $('#moisLabel').textContent = `${MOIS[cur.m-1]} ${cur.y}`;
+  const {startUTC, endUTC}=monthWindow(cur.y, cur.m);
+  const nls=findNLs(new Date(startUTC.getTime()-45*864e5), new Date(endUTC.getTime()+45*864e5));
+  const inMonth=t=>{const p=parisYM(t.date); return p.y===cur.y && p.m===cur.m;};
+  const dlT=transitions(demeure, startUTC, endUTC).filter(inMonth);
+  const mlT=transitions(d=>maison(d,nls), startUTC, endUTC).filter(inMonth);
+
+  $('#tbodyDL').innerHTML = dlT.map(t=>
+      `<tr><td class="n">${t.val}</td><td class="dt">${parisDT(t.date)}</td></tr>`).join('')
+      || `<tr><td colspan="2" class="sg">Aucune entrée ce mois-ci.</td></tr>`;
+
+  const mlRows = mlT.map(t=>{
+      const c=ML_CAT[t.val];
+      if(favNeutreOnly && !(c==='favorable'||c==='neutre')) return '';
+      return `<tr><td class="n">${t.val}</td><td class="dt">${parisDT(t.date)}</td><td>${badge(c)}</td></tr>`;
+    }).join('');
+  $('#tbodyML').innerHTML = mlRows || `<tr><td colspan="3" class="sg">Aucune maison favorable ou neutre ce mois-ci.</td></tr>`;
+  postHeight();
+}
+
+function shift(delta){
+  let m=cur.m+delta, y=cur.y;
+  if(m<1){m=12;y--;} if(m>12){m=1;y++;}
+  cur={y,m}; renderMonth();
+}
+
+function renderLegend(){
+  $('#legend').innerHTML = ['favorable','neutre','douteuse','mauvaise'].map(badge).join('');
+}
+function postHeight(){
+  const h=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+  if(window.parent && window.parent!==window) window.parent.postMessage({agHeight:h}, '*');
+}
+
+(async function(){
+  try{
+    swe = new SwissEph();
+    await swe.initSwissEph();
+    $('#status').hidden=true; $('#app').hidden=false;
+    $('#prev').addEventListener('click', ()=>shift(-1));
+    $('#next').addEventListener('click', ()=>shift(1));
+    $('#utile').addEventListener('change', e=>{ favNeutreOnly=e.target.checked; renderMonth(); });
+    renderLegend(); renderToday(); renderMonth();
+    window.addEventListener('load', postHeight);
+    window.addEventListener('resize', postHeight);
+    if(window.ResizeObserver) new ResizeObserver(postHeight).observe(document.body);
+    setTimeout(postHeight, 500);
+  }catch(err){
+    console.error(err);
+    $('#status').textContent="Impossible de charger le moteur de calcul. Réessayez plus tard.";
+    $('#status').classList.add('err');
+  }
+})();
+</script>
+</body>
+</html>
