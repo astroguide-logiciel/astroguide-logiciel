@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Lune aujourd'hui — Astroguide.net</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--rouge:#A81C24;--rouge-clair:#F5E5E6;--encre:#181316;--gris:#6B6460;--trait:#E9E0E0;--surface:#FBF8F8;}
+  *{box-sizing:border-box}
+  body{margin:0;background:transparent;color:var(--encre);font-family:'Inter',system-ui,sans-serif}
+  .pave{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.pave{grid-template-columns:1fr}}
+  .cell{display:flex;align-items:center;gap:14px;border:1px solid var(--trait);border-radius:14px;padding:14px 16px;background:#fff}
+  .cell.accent{background:var(--rouge)}
+  .cell.accent .num{color:#fff}.cell.accent .lab{color:#F5D9DB}.cell.accent .ctx{color:#FBEDEE}
+  .num{font-family:'Spectral',Georgia,serif;font-weight:600;font-size:38px;line-height:1;color:var(--rouge);min-width:1.4em;text-align:center}
+  .txt{min-width:0}
+  .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris)}
+  .ctx{font-size:14px;color:var(--encre);margin-top:3px}
+  .badge{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:2px 9px;margin-top:4px}
+  .load{color:var(--gris);font-size:14px;padding:8px 2px}
+</style>
+</head>
+<body>
+<div id="pave" class="load">La Lune aujourd'hui…</div>
+<script type="module">
+import SwissEph from 'https://cdn.jsdelivr.net/npm/swisseph-wasm@0.1.0/src/swisseph.js';
+const ML_CAT={};[['mauvaise',[1,9,10,15,19,20,28]],['douteuse',[2,6,14,18,23,27]],['neutre',[3,4,5,11,16,21,24,25,26]],['favorable',[7,8,12,13,17,22]]].forEach(([c,a])=>a.forEach(n=>ML_CAT[n]=c));
+const CAT={favorable:['#e6f2ec','#1f7a4d'],neutre:['#FBF8F8','#6B6460'],douteuse:['#FBE7D6','#B4552E'],mauvaise:['#F5E5E6','#A81C24']};
+const SIGNS=['Bélier','Taureau','Gémeaux','Cancer','Lion','Vierge','Balance','Scorpion','Sagittaire','Capricorne','Verseau','Poissons'];
+let swe;const J=2440587.5;const jd=d=>J+d.getTime()/864e5;const nrm=x=>((x%360)+360)%360;
+const lon=(d,b)=>nrm(swe.calc(jd(d),b,swe.SEFLG_SWIEPH).longitude);
+const mo=d=>lon(d,swe.SE_MOON),su=d=>lon(d,swe.SE_SUN),el=d=>nrm(mo(d)-su(d));
+const BINT=[8.5,17.5,27,37,47.5,58.5,70,82,94.5,107.5,121,135,149.5];
+function nls(s,e){const r=[];let t=s.getTime();const st=6*36e5;let p=el(new Date(t));while(t<e.getTime()){const t2=t+st,c=el(new Date(t2));if(p>300&&c<60){let lo=t,hi=t2;for(let i=0;i<46;i++){const m=(lo+hi)/2;if(el(new Date(m))>180)lo=m;else hi=m;}const d=new Date(hi);r.push({date:d,lon:su(d)});}p=c;t=t2;}return r;}
+function DL(d){return Math.floor(mo(d)/(360/28))+1;}
+function ML(d,L){const e=el(d),m=mo(d);if(e<=180){const pv=L.filter(n=>n.date<=d).pop();if(!pv)return null;const dd=nrm(m-pv.lon);let k=1;for(const b of BINT)if(dd>=b)k++;return k;}const nx=L.find(n=>n.date>d);if(!nx)return null;const dd=nrm(nx.lon-m);let j=0;for(const b of BINT)if(dd>=b)j++;return 28-j;}
+function badge(c){const[bg,fg]=CAT[c];return `<span class="badge" style="background:${bg};color:${fg}">${c}</span>`;}
+function ph(){const h=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);if(window.parent&&window.parent!==window)window.parent.postMessage({agHeight:h},'*');}
+(async function(){try{
+  swe=new SwissEph();await swe.initSwissEph();
+  const now=new Date();const L=nls(new Date(now.getTime()-45*864e5),new Date(now.getTime()+45*864e5));
+  const dl=DL(now),ml=ML(now,L),c=ML_CAT[ml];
+  const ml2=mo(now),si=Math.floor(ml2/30),deg=Math.floor(ml2-30*si);
+  document.getElementById('pave').className='pave';
+  document.getElementById('pave').innerHTML=
+    `<div class="cell"><div class="num">${dl}</div><div class="txt"><div class="lab">Demeure du jour</div><div class="ctx">Lune à ${deg}° ${SIGNS[si]}</div></div></div>`+
+    `<div class="cell accent"><div class="num">${ml}</div><div class="txt"><div class="lab">Maison du jour</div><div>${badge(c)}</div></div></div>`;
+  ph();window.addEventListener('resize',ph);if(window.ResizeObserver)new ResizeObserver(ph).observe(document.body);setTimeout(ph,500);
+}catch(e){console.error(e);document.getElementById('pave').textContent="";}})();
+</script>
+</body>
+</html>
