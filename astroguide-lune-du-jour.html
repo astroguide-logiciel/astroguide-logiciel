@@ -11,9 +11,11 @@
   :root{--rouge:#A81C24;--rouge-clair:#F5E5E6;--encre:#181316;--gris:#6B6460;--trait:#E9E0E0;--surface:#FBF8F8;}
   *{box-sizing:border-box}
   body{margin:0;background:transparent;color:var(--encre);font-family:'Inter',system-ui,sans-serif}
+  a.lien{text-decoration:none;color:inherit;display:block}
   .pave{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:520px){.pave{grid-template-columns:1fr}}
-  .cell{display:flex;align-items:center;gap:14px;border:1px solid var(--trait);border-radius:14px;padding:14px 16px;background:#fff}
+  .cell{display:flex;align-items:center;gap:14px;border:1px solid var(--trait);border-radius:14px;padding:14px 16px;background:#fff;transition:.15s}
+  a.lien:hover .cell{border-color:var(--rouge);box-shadow:0 6px 18px rgba(24,19,22,.06)}
   .cell.accent{background:var(--rouge)}
   .cell.accent .num{color:#fff}.cell.accent .lab{color:#F5D9DB}.cell.accent .ctx{color:#FBEDEE}
   .num{font-family:'Spectral',Georgia,serif;font-weight:600;font-size:38px;line-height:1;color:var(--rouge);min-width:1.4em;text-align:center}
@@ -21,11 +23,12 @@
   .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris)}
   .ctx{font-size:14px;color:var(--encre);margin-top:3px}
   .badge{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:2px 9px;margin-top:4px}
+  .cta{text-align:right;color:var(--rouge);font-size:13px;font-weight:500;margin-top:8px}
   .load{color:var(--gris);font-size:14px;padding:8px 2px}
 </style>
 </head>
 <body>
-<div id="pave" class="load">La Lune aujourd'hui…</div>
+<div id="root" class="load">La Lune aujourd'hui…</div>
 <script type="module">
 import SwissEph from 'https://cdn.jsdelivr.net/npm/swisseph-wasm@0.1.0/src/swisseph.js';
 const ML_CAT={};[['mauvaise',[1,9,10,15,19,20,28]],['douteuse',[2,6,14,18,23,27]],['neutre',[3,4,5,11,16,21,24,25,26]],['favorable',[7,8,12,13,17,22]]].forEach(([c,a])=>a.forEach(n=>ML_CAT[n]=c));
@@ -45,12 +48,20 @@ function ph(){const h=Math.max(document.documentElement.scrollHeight,document.bo
   const now=new Date();const L=nls(new Date(now.getTime()-45*864e5),new Date(now.getTime()+45*864e5));
   const dl=DL(now),ml=ML(now,L),c=ML_CAT[ml];
   const ml2=mo(now),si=Math.floor(ml2/30),deg=Math.floor(ml2-30*si);
-  document.getElementById('pave').className='pave';
-  document.getElementById('pave').innerHTML=
+  const cells=
+    `<div class="pave">`+
     `<div class="cell"><div class="num">${dl}</div><div class="txt"><div class="lab">Demeure du jour</div><div class="ctx">Lune à ${deg}° ${SIGNS[si]}</div></div></div>`+
-    `<div class="cell accent"><div class="num">${ml}</div><div class="txt"><div class="lab">Maison du jour</div><div>${badge(c)}</div></div></div>`;
+    `<div class="cell accent"><div class="num">${ml}</div><div class="txt"><div class="lab">Maison du jour</div><div>${badge(c)}</div></div></div>`+
+    `</div>`;
+  const to=new URLSearchParams(location.search).get('to');
+  const root=document.getElementById('root'); root.className='';
+  if(to){
+    root.innerHTML=`<a class="lien" href="${to}" target="_top">${cells}<div class="cta">Voir le calendrier lunaire →</div></a>`;
+  }else{
+    root.innerHTML=cells;
+  }
   ph();window.addEventListener('resize',ph);if(window.ResizeObserver)new ResizeObserver(ph).observe(document.body);setTimeout(ph,500);
-}catch(e){console.error(e);document.getElementById('pave').textContent="";}})();
+}catch(e){console.error(e);document.getElementById('root').textContent="";}})();
 </script>
 </body>
 </html>
