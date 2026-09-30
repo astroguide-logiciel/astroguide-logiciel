@@ -299,6 +299,26 @@
         <div id="transitsBody"></div>
       </section>
 
+      <section class="card" id="exportCard" aria-labelledby="exp-title" hidden>
+        <div class="export-head">
+          <div>
+            <h2 id="exp-title" style="margin-bottom:2px">Export texte</h2>
+            <p class="sub" style="margin:0">Réutilisable dans un autre logiciel, un tableur ou un document.</p>
+          </div>
+          <div class="export-actions">
+            <div class="seg" role="group" aria-label="Format d'export" style="width:auto">
+              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
+              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
+              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
+            </div>
+          </div>
+        </div>
+        <pre id="exportText"></pre>
+        <div class="export-actions" style="margin-top:14px">
+          <button class="btn" id="copyBtn">Copier</button>
+          <button class="btn" id="dlBtn">Télécharger</button>
+        </div>
+      </section>
       <section class="card" id="returnCard" aria-labelledby="rs-title" hidden>
         <h2 id="rs-title">Révolution solaire</h2>
         <p class="sub">Instant où le Soleil retrouve sa position natale, une fois l'an. Zodiaque tropical · maisons Placidus + Whole Sign · dressée au lieu choisi.</p>
@@ -410,26 +430,6 @@
         <div id="seriesBody"></div>
       </section>
 
-      <section class="card" id="exportCard" aria-labelledby="exp-title" hidden>
-        <div class="export-head">
-          <div>
-            <h2 id="exp-title" style="margin-bottom:2px">Export texte</h2>
-            <p class="sub" style="margin:0">Réutilisable dans un autre logiciel, un tableur ou un document.</p>
-          </div>
-          <div class="export-actions">
-            <div class="seg" role="group" aria-label="Format d'export" style="width:auto">
-              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
-              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
-              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
-            </div>
-          </div>
-        </div>
-        <pre id="exportText"></pre>
-        <div class="export-actions" style="margin-top:14px">
-          <button class="btn" id="copyBtn">Copier</button>
-          <button class="btn" id="dlBtn">Télécharger</button>
-        </div>
-      </section>
   </div><!-- /.results-full -->
 
   <footer>
