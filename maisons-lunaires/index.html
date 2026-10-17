@@ -61,6 +61,26 @@
   .row-muted .n{color:var(--gris-clair)}
   .row-muted .sg{color:var(--gris-clair); font-style:italic}
 
+  /* Frise chronologique du mois */
+  .timeline{margin-top:4px}
+  .day{margin:0 0 4px}
+  .dayhead{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:14px; color:var(--rouge);
+    text-transform:capitalize; padding:14px 0 6px; border-bottom:1px solid var(--trait); margin-bottom:4px}
+  .ev{display:grid; grid-template-columns:50px auto 1fr; gap:10px; align-items:baseline;
+    padding:8px 0; border-bottom:1px solid var(--surface)}
+  .day .ev:last-child{border-bottom:none}
+  .ev .time{font-variant-numeric:tabular-nums; color:var(--gris); font-size:13px}
+  .ev .chip{font-size:11.5px; font-weight:600; padding:2px 10px; border-radius:999px; white-space:nowrap; align-self:center}
+  .ev-dl .chip{background:var(--rouge-clair); color:var(--rouge-fonce)}
+  .ev-ml .chip{background:var(--rouge); color:#fff}
+  .ev .sig{font-size:13px; color:var(--encre)}
+  .ev.muted .sig{color:var(--gris-clair); font-style:italic}
+  .ev.muted .chip{opacity:.6}
+  @media(max-width:480px){
+    .ev{grid-template-columns:50px 1fr; row-gap:3px}
+    .ev .sig{grid-column:1 / -1}
+  }
+
   footer{margin-top:30px; color:var(--gris); font-size:12px; line-height:1.7; border-top:1px solid var(--trait); padding-top:16px}
   footer a{color:var(--rouge)}
 </style>
@@ -75,8 +95,6 @@
 <body>
 <div class="wrap">
   <h1>Demeures &amp; maisons lunaires</h1>
-  <p class="lede">Deux lectures complémentaires de la Lune : sa <strong>demeure</strong> (position dans le zodiaque, 28 tranches égales) et sa <strong>maison</strong> (place dans le cycle Soleil-Lune, des Nouvelle à Pleine Lune). Heures en fuseau de Paris.</p>
-
   <div id="status" class="status">Chargement du moteur Swiss Ephemeris…</div>
 
   <div id="app" hidden>
@@ -88,21 +106,9 @@
         <button id="next" type="button">Mois suivant ›</button>
       </div>
       <div class="mois" id="moisLabel"></div>
-      <label class="util"><input type="checkbox" id="utile"> Utiles seulement</label>
     </div>
 
-    <div class="cols">
-      <div class="col">
-        <h2>Demeures lunaires</h2>
-        <table><thead><tr><th>DL</th><th>Début</th><th>Signification</th></tr></thead>
-        <tbody id="tbodyDL"></tbody></table>
-      </div>
-      <div class="col">
-        <h2>Maisons lunaires</h2>
-        <table><thead><tr><th>ML</th><th>Début</th><th>Signification</th></tr></thead>
-        <tbody id="tbodyML"></tbody></table>
-      </div>
-    </div>
+    <div id="timeline" class="timeline"></div>
   </div>
 
   <footer>
@@ -232,6 +238,9 @@ function transitions(fn, start, end, stepMin=10){
 /* ---------- Fuseau de Paris ---------- */
 const dtf = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
 const parisDT = d => dtf.format(d).replace(', ', ' ');
+const dayFmt  = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', weekday:'short', day:'numeric', month:'short'});
+const timeFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', hour:'2-digit', minute:'2-digit'});
+const dayKeyFmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris', year:'numeric', month:'2-digit', day:'2-digit'});
 function parisYM(d){
   const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris', year:'numeric', month:'2-digit'}).formatToParts(d);
   return { y:+p.find(x=>x.type==='year').value, m:+p.find(x=>x.type==='month').value };
@@ -240,20 +249,39 @@ const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','
 
 /* ---------- État ---------- */
 let cur = parisYM(new Date());   // {y, m} affiché
-let utileOnly = false;
 
 function $(s){ return document.querySelector(s); }
+
+// Premier changement de valeur de fn après "from" (date de fin de la période en cours).
+function nextChange(fn, from, maxDays=4, stepMin=10){
+  let t=from.getTime(); const end=t+maxDays*864e5; const step=stepMin*60000;
+  let prev=fn(new Date(t));
+  while(t<end){
+    const t2=t+step; const cur=fn(new Date(t2));
+    if(cur!==prev && cur!=null && prev!=null){
+      let lo=t, hi=t2;
+      for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(fn(new Date(mid))===prev) lo=mid; else hi=mid; }
+      return new Date(hi);
+    }
+    if(cur!=null) prev=cur;
+    t=t2;
+  }
+  return null;
+}
 
 function renderToday(){
   const now=new Date();
   const nls=findNLs(new Date(now.getTime()-45*864e5), new Date(now.getTime()+45*864e5));
   const dl=demeure(now), ml=maison(now, nls);
-  const card=(lab,n,sig,accent)=>{
+  const dlEnd=nextChange(demeure, now);
+  const mlEnd=nextChange(d=>maison(d,nls), now);
+  const card=(lab,n,sig,accent,end)=>{
     const s=sig[n];
+    const until = end ? `<div class="until">Jusqu'au ${parisDT(end)}</div>` : '';
     return `<div class="tcard"><div class="head ${accent?'accent':''}"><span class="num">${n}</span><span class="lab">${lab} du jour</span></div>
-      <div class="body">${ s ? `<div class="sig">${s}</div>` : `<div class="none">Pas de signification particulière pour la vie quotidienne.</div>`}</div></div>`;
+      <div class="body">${ s ? `<div class="sig">${s}</div>` : `<div class="none">Pas de signification particulière pour la vie quotidienne.</div>`}${until}</div></div>`;
   };
-  $('#today').innerHTML = card('Demeure', dl, DL_SIG, false) + card('Maison', ml, ML_SIG, true);
+  $('#today').innerHTML = card('Demeure', dl, DL_SIG, false, dlEnd) + card('Maison', ml, ML_SIG, true, mlEnd);
 }
 
 function monthWindow(y,m){
@@ -266,17 +294,34 @@ function renderMonth(){
   $('#moisLabel').textContent = `${MOIS[cur.m-1]} ${cur.y}`;
   const {startUTC, endUTC}=monthWindow(cur.y, cur.m);
   const nls=findNLs(new Date(startUTC.getTime()-45*864e5), new Date(endUTC.getTime()+45*864e5));
-  const dlT=transitions(demeure, startUTC, endUTC).filter(t=>{const p=parisYM(t.date); return p.y===cur.y && p.m===cur.m;});
-  const mlT=transitions(d=>maison(d,nls), startUTC, endUTC).filter(t=>{const p=parisYM(t.date); return p.y===cur.y && p.m===cur.m;});
+  const inMonth=t=>{const p=parisYM(t.date); return p.y===cur.y && p.m===cur.m;};
+  const dlT=transitions(demeure, startUTC, endUTC).filter(inMonth).map(t=>({date:t.date, val:t.val, type:'DL'}));
+  const mlT=transitions(d=>maison(d,nls), startUTC, endUTC).filter(inMonth).map(t=>({date:t.date, val:t.val, type:'ML'}));
+  const evs=dlT.concat(mlT).sort((a,b)=>a.date-b.date);
 
-  const rows=(trans,sig)=> trans.map(t=>{
-      const s=sig[t.val]; const muted=!s;
-      if(utileOnly && muted) return '';
-      return `<tr class="${muted?'row-muted':''}"><td class="n">${t.val}</td><td class="dt">${parisDT(t.date)}</td><td class="sg">${ s || '—' }</td></tr>`;
-    }).join('') || `<tr><td colspan="3" class="sg">Aucune entrée${utileOnly?' utile':''} ce mois-ci.</td></tr>`;
+  if(!evs.length){
+    $('#timeline').innerHTML = `<div class="sg" style="color:var(--gris);padding:16px 0">Aucune entrée ce mois-ci.</div>`;
+    postHeight(); return;
+  }
 
-  $('#tbodyDL').innerHTML = rows(dlT, DL_SIG);
-  $('#tbodyML').innerHTML = rows(mlT, ML_SIG);
+  let html='', curKey=null;
+  for(const e of evs){
+    const key=dayKeyFmt.format(e.date);
+    if(key!==curKey){
+      if(curKey!==null) html+='</div>';
+      html+=`<div class="day"><div class="dayhead">${dayFmt.format(e.date)}</div>`;
+      curKey=key;
+    }
+    const sig=(e.type==='DL'?DL_SIG:ML_SIG)[e.val];
+    const muted=!sig;
+    const typ=e.type==='DL'?'Demeure':'Maison';
+    html+=`<div class="ev ev-${e.type.toLowerCase()}${muted?' muted':''}">`
+        + `<span class="time">${timeFmt.format(e.date)}</span>`
+        + `<span class="chip">${typ} ${e.val}</span>`
+        + `<span class="sig">${sig||'—'}</span></div>`;
+  }
+  html+='</div>';
+  $('#timeline').innerHTML = html;
   postHeight();
 }
 
@@ -300,7 +345,6 @@ function postHeight(){
     $('#status').hidden=true; $('#app').hidden=false;
     $('#prev').addEventListener('click', ()=>shift(-1));
     $('#next').addEventListener('click', ()=>shift(1));
-    $('#utile').addEventListener('change', e=>{ utileOnly=e.target.checked; renderMonth(); });
     renderToday();
     renderMonth();
     window.addEventListener('load', postHeight);

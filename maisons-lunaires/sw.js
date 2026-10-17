@@ -2,7 +2,7 @@
    Stratégie : « stale-while-revalidate ». La coquille locale et les ressources
    CDN (moteur Swiss Ephemeris, polices) sont mises en cache au fil des visites ;
    une connexion est requise au premier chargement, puis l'app fonctionne hors-ligne. */
-const CACHE = 'lunaire-v1';
+const CACHE = 'lunaire-v2';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png'
