@@ -40,7 +40,7 @@
   .degree-rule i:first-child{border-left:none}
 
   /* ---- Layout ---- */
-  .grid{display:grid; grid-template-columns:360px 1fr; gap:26px; align-items:start}
+  .grid{display:grid; grid-template-columns:minmax(320px,460px); gap:26px; align-items:start}
   @media (max-width:860px){ .grid{grid-template-columns:1fr} }
 
   .card{background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius);
@@ -155,7 +155,7 @@
   /* ---- Export ---- */
   .export-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap}
   .export-actions{display:flex; gap:8px; flex-wrap:wrap}
-  pre#exportText{background:var(--night-2); border:1px solid var(--line); border-radius:8px;
+  .export-block pre{background:var(--night-2); border:1px solid var(--line); border-radius:8px;
     padding:16px; margin:16px 0 0; overflow:auto; max-height:360px;
     font-family:var(--mono); font-size:12.5px; line-height:1.65; color:var(--parch); white-space:pre}
   .copied{color:var(--teal)!important; border-color:var(--teal)!important}
@@ -177,6 +177,57 @@
   .results-full .card + .card{ margin-top:22px; }
   /* Avant calcul (roue masquée), le formulaire n'occupe pas toute la largeur */
   .grid:has(#wheelCard[hidden]){ grid-template-columns:minmax(320px,440px); }
+
+  /* ---- Vimshottari Dasha ---- */
+  .dasha-controls{display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px}
+  .dasha-controls label{display:flex; flex-direction:column; gap:4px; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:600}
+  .dasha-controls select, .dasha-controls input{font-family:var(--ui); font-size:13px; padding:7px 10px;
+    border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--parch); text-transform:none; letter-spacing:0; font-weight:400}
+  .dasha-controls select{cursor:pointer}
+  .dasha-controls input{width:88px}
+  .dasha-controls select:focus, .dasha-controls input:focus{outline:2px solid var(--brass); outline-offset:2px; border-color:transparent}
+  .dasha-moon{font-size:13px; color:var(--muted); background:var(--panel-2,#F7F2F2);
+    border:1px solid var(--line-soft); border-radius:8px; padding:10px 12px; margin-bottom:10px; line-height:1.55}
+  .dasha-moon b{color:var(--parch)}
+  .dasha-now{font-size:13.5px; border:1px solid var(--brass); background:#F7E9EA;
+    border-radius:8px; padding:11px 13px; margin-bottom:16px; line-height:1.6}
+  .dasha-now .dn-label{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass); font-weight:600; display:block; margin-bottom:3px}
+  .dasha-now .dn-chain{font-family:var(--display); font-size:16px; color:var(--parch); font-weight:600}
+  .dasha-now .dn-dates{color:var(--muted); font-size:12px}
+  details.maha{border:1px solid var(--line-soft); border-radius:8px; margin:5px 0; overflow:hidden}
+  details.maha>summary, details.bhukti>summary{cursor:pointer; list-style:none; display:flex;
+    align-items:baseline; gap:10px; padding:9px 12px; font-size:13.5px}
+  details.maha>summary::-webkit-details-marker, details.bhukti>summary::-webkit-details-marker{display:none}
+  details.maha>summary::before, details.bhukti>summary::before{content:"\25b8"; color:var(--brass); transition:.15s; font-size:11px}
+  details.maha[open]>summary::before, details.bhukti[open]>summary::before{transform:rotate(90deg)}
+  details.maha>summary{font-family:var(--display); font-weight:600; background:#fff}
+  details.maha>summary:hover{background:var(--panel-2,#F7F2F2)}
+  .dasha-lord{min-width:84px; color:var(--parch)}
+  .dasha-dates{color:var(--muted); font-size:12px; font-family:var(--ui)}
+  .dasha-dur{margin-left:auto; color:var(--muted); font-size:11.5px; font-family:var(--mono)}
+  .maha-inner{padding:2px 10px 8px 22px; background:var(--panel-2,#FBF8F8)}
+  details.bhukti{border-bottom:1px solid var(--line-soft)}
+  details.bhukti:last-child{border-bottom:none}
+  details.bhukti>summary{font-size:13px}
+  .bhukti-inner{padding:2px 8px 6px 22px}
+  .praty-row{display:flex; align-items:baseline; gap:10px; padding:4px 12px; font-size:12.5px}
+  .dasha-node.is-now>summary, .praty-row.is-now{background:#F7E9EA; border-radius:6px}
+  .dasha-node.is-now>summary .dasha-lord, .praty-row.is-now .dasha-lord{color:var(--brass)}
+
+  /* ---- Onglets des résultats ---- */
+  .tabbar{display:flex; flex-wrap:wrap; gap:4px; border-bottom:1px solid var(--line);
+    margin:0 0 22px; position:sticky; top:0; background:#fff; z-index:5; padding-top:4px}
+  .tab{appearance:none; -webkit-appearance:none; border:none; background:none;
+    font-family:var(--ui); font-size:14.5px; font-weight:600; color:var(--muted);
+    padding:11px 18px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;
+    border-radius:8px 8px 0 0; transition:color .12s}
+  .tab:hover{color:var(--parch); background:var(--night-2)}
+  .tab[aria-selected="true"]{color:var(--brass); border-bottom-color:var(--brass)}
+  .tab:focus-visible{outline:2px solid var(--brass); outline-offset:-2px}
+  .tabpanel[hidden]{display:none}
+  .tabpanel > .card + .card{margin-top:22px}
+  @media (max-width:560px){ .tab{flex:1 1 auto; padding:11px 10px; text-align:center} }
 </style>
 </head>
 <body>
@@ -242,20 +293,28 @@
       <div class="actions">
         <button class="btn btn-primary" id="calc">Calculer le thème</button>
         <button class="btn btn-ghost" id="now" title="Position et heure actuelles à Paris">Maintenant</button>
+        <button class="btn btn-ghost" id="clear" title="Vider le formulaire et les résultats">Effacer</button>
       </div>
       <div id="status" role="status">Chargement du moteur Swiss Ephemeris…</div>
     </section>
 
-    <!-- ============ CARTE DU CIEL (haut, colonne droite) ============ -->
-    <section class="card" id="wheelCard" aria-labelledby="wheel-title" hidden>
+    </div><!-- /.grid -->
+
+  <!-- ============ RÉSULTATS (onglets, pleine largeur) ============ -->
+  <div class="results-full" id="resultsArea" hidden>
+    <div class="tabbar" role="tablist" aria-label="Sections du thème">
+      <button class="tab" id="tab-theme" data-tab="theme" type="button" role="tab" aria-selected="true">Thème</button>
+      <button class="tab" id="tab-prev"  data-tab="prev"  type="button" role="tab" aria-selected="false">Prévisions</button>
+      <button class="tab" id="tab-vedic" data-tab="vedic" type="button" role="tab" aria-selected="false">Védique</button>
+    </div>
+
+    <div class="tabpanel" data-panel="theme" role="tabpanel" aria-labelledby="tab-theme">
+      <section class="card" id="wheelCard" aria-labelledby="wheel-title" hidden>
       <h2 id="wheel-title">Carte du ciel</h2>
       <p class="sub">Zodiaque tropical · maisons Placidus · ascendant à gauche · aspects majeurs tracés.</p>
       <div class="wheel-wrap" id="wheel"></div>
     </section>
-  </div><!-- /.grid -->
 
-  <!-- ============ RÉSULTATS (pleine largeur) ============ -->
-  <div class="results-full">
       <section class="card" aria-labelledby="out-title">
         <h2 id="out-title">Positions</h2>
         <p class="sub">Zodiaque tropical · nœuds en position vraie.</p>
@@ -277,6 +336,29 @@
         <div id="aspectsBody"></div>
       </section>
 
+      <section class="card export-block" id="export-theme">
+        <div class="export-head">
+          <div>
+            <h2 style="margin-bottom:2px">Export</h2>
+            <p class="sub" style="margin:0">Le thème natal : positions, maisons, dignités, aspects.</p>
+          </div>
+          <div class="export-actions">
+            <div class="seg" data-seg="theme" role="group" aria-label="Format d'export" style="width:auto">
+              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
+              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
+              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
+            </div>
+          </div>
+        </div>
+        <pre></pre>
+        <div class="export-actions" style="margin-top:14px">
+          <button class="btn" data-copy="theme">Copier</button>
+          <button class="btn" data-dl="theme">Télécharger</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="tabpanel" data-panel="prev" role="tabpanel" aria-labelledby="tab-prev" hidden>
       <section class="card" id="transitsCard" aria-labelledby="tr-title" hidden>
         <h2 id="tr-title">Transits</h2>
         <p class="sub">Positions transitantes à une date donnée, et leurs aspects aux points du thème natal.</p>
@@ -299,26 +381,6 @@
         <div id="transitsBody"></div>
       </section>
 
-      <section class="card" id="exportCard" aria-labelledby="exp-title" hidden>
-        <div class="export-head">
-          <div>
-            <h2 id="exp-title" style="margin-bottom:2px">Export texte</h2>
-            <p class="sub" style="margin:0">Réutilisable dans un autre logiciel, un tableur ou un document.</p>
-          </div>
-          <div class="export-actions">
-            <div class="seg" role="group" aria-label="Format d'export" style="width:auto">
-              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
-              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
-              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
-            </div>
-          </div>
-        </div>
-        <pre id="exportText"></pre>
-        <div class="export-actions" style="margin-top:14px">
-          <button class="btn" id="copyBtn">Copier</button>
-          <button class="btn" id="dlBtn">Télécharger</button>
-        </div>
-      </section>
       <section class="card" id="returnCard" aria-labelledby="rs-title" hidden>
         <h2 id="rs-title">Révolution solaire</h2>
         <p class="sub">Instant où le Soleil retrouve sa position natale, une fois l'an. Zodiaque tropical · maisons Placidus + Whole Sign · dressée au lieu choisi.</p>
@@ -430,6 +492,78 @@
         <div id="seriesBody"></div>
       </section>
 
+      <section class="card export-block" id="export-prev">
+        <div class="export-head">
+          <div>
+            <h2 style="margin-bottom:2px">Export</h2>
+            <p class="sub" style="margin:0">Transits et révolution solaire.</p>
+          </div>
+          <div class="export-actions">
+            <div class="seg" data-seg="prev" role="group" aria-label="Format d'export" style="width:auto">
+              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
+              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
+              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
+            </div>
+          </div>
+        </div>
+        <pre></pre>
+        <div class="export-actions" style="margin-top:14px">
+          <button class="btn" data-copy="prev">Copier</button>
+          <button class="btn" data-dl="prev">Télécharger</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="tabpanel" data-panel="vedic" role="tabpanel" aria-labelledby="tab-vedic" hidden>
+      <section class="card" id="dashaCard" aria-labelledby="dasha-title" hidden>
+        <h2 id="dasha-title">Périodes védiques · Vimshottari Dasha</h2>
+        <p class="sub">Bloc d'astrologie indienne (Jyotish), distinct du thème tropical ci-dessus&#8239;: zodiaque <b>sidéral</b>. Les grandes périodes (Mahadasha) se subdivisent en sous-périodes (Bhukti) puis en Pratyantardasha.</p>
+        <div class="dasha-controls">
+          <label>Ayanamsa
+            <select id="dashaAyan">
+              <option value="1" selected>Lahiri</option>
+              <option value="0">Fagan/Bradley</option>
+              <option value="3">Raman</option>
+              <option value="5">Krishnamurti</option>
+            </select>
+          </label>
+          <label>Position de la Lune
+            <select id="dashaParallax">
+              <option value="0" selected>Géocentrique</option>
+              <option value="1">Topocentrique (parallaxe)</option>
+            </select>
+          </label>
+          <label>Ajustement ayanamsa (″)
+            <input id="dashaAdj" type="number" value="0" step="0.1" inputmode="decimal">
+          </label>
+        </div>
+        <div id="dashaMoon" class="dasha-moon"></div>
+        <div id="dashaNow" class="dasha-now"></div>
+        <div id="dashaBody"></div>
+        <p class="hint" style="margin-top:12px">Calcul sur une année de 365,25&#8239;jours. <b>Ajustement ayanamsa</b> : un décalage fin en secondes d'arc (+ = ayanamsa plus grand, Lune reculée) pour caler l'outil sur une source donnée&#8239;; réglez-le en observant la Lune sidérale ci-dessus, puis il reste valable pour toutes les naissances. La période en cours au jour d'aujourd'hui est mise en évidence&#8239;; dépliez une Mahadasha pour ses Bhuktis, puis un Bhukti pour ses Pratyantardashas.</p>
+      </section>
+
+      <section class="card export-block" id="export-vedic">
+        <div class="export-head">
+          <div>
+            <h2 style="margin-bottom:2px">Export</h2>
+            <p class="sub" style="margin:0">Les périodes Vimshottari (Dasha).</p>
+          </div>
+          <div class="export-actions">
+            <div class="seg" data-seg="vedic" role="group" aria-label="Format d'export" style="width:auto">
+              <button type="button" data-fmt="txt" aria-pressed="true" style="flex:0 0 auto;padding:8px 14px">Texte</button>
+              <button type="button" data-fmt="csv" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">CSV</button>
+              <button type="button" data-fmt="json" aria-pressed="false" style="flex:0 0 auto;padding:8px 14px">JSON</button>
+            </div>
+          </div>
+        </div>
+        <pre></pre>
+        <div class="export-actions" style="margin-top:14px">
+          <button class="btn" data-copy="vedic">Copier</button>
+          <button class="btn" data-dl="vedic">Télécharger</button>
+        </div>
+      </section>
+    </div>
   </div><!-- /.results-full -->
 
   <footer>
@@ -570,10 +704,11 @@ function dignityLords(lon, isDay){
 
 /* ---------- État ---------- */
 let swe = null, ready = false;
-let exportFmt = 'txt';
+const exportFmt = { theme:'txt', prev:'txt', vedic:'txt' };
 let lastChart = null;  // dernier thème calculé (pour l'export)
 let lastTransits = null;  // derniers transits calculés
 let lastReturn = null;  // dernière révolution solaire calculée
+let lastDasha = null;    // dernières périodes Vimshottari calculées
 let rsLieu = 'naissance';  // lieu de la RS : 'naissance' ou 'anniversaire'
 let lastSeries = null;  // dernière série de RS calculée
 let serLieu = 'naissance';  // lieu de la série
@@ -1436,12 +1571,12 @@ function renderWheel(c){
 /* ---------- Génération de l'export ---------- */
 function pad(s, n){ s = String(s); return s + ' '.repeat(Math.max(0, n - s.length)); }
 
-function buildText(c, tr){
+function buildText(c, tr, title){
   const i = c.input;
   const tzStr = (i.tz >= 0 ? '+' : '') + i.tz;
   const date = `${String(i.da).padStart(2,'0')}/${String(i.mo).padStart(2,'0')}/${i.y}`;
   const time = `${String(i.hh).padStart(2,'0')}:${String(i.mi).padStart(2,'0')}`;
-  let out = `THÈME NATAL\n`;
+  let out = `${title || 'THÈME NATAL'}\n`;
   if (i.name) out += `${i.name}\n`;
   out += `${date}  ${time}  (UTC${tzStr})\n`;
   out += `Lieu : ${i.lat}, ${i.lon}\n`;
@@ -1479,29 +1614,32 @@ function buildText(c, tr){
            + `${pad(shortName(a2.b.name), 16)} ${pad(dv.text, 7)} ${a2.phase}\n`;
     }
   }
-  if (tr){
-    const t = tr.input;
-    const tdate = `${String(t.da).padStart(2,'0')}/${String(t.mo).padStart(2,'0')}/${t.y}`;
-    const ttime = `${String(t.hh).padStart(2,'0')}:${String(t.mi).padStart(2,'0')}`;
-    const ttz = (t.tz >= 0 ? '+' : '') + t.tz;
-    out += `\n${'-'.repeat(52)}\n\nTRANSITS pour le ${tdate} ${ttime} (UTC${ttz})\n`;
-    out += `Orbes : conjonction ${tr.orbs.conj}° - sextile ${tr.orbs.sext}° - carré ${tr.orbs.squa}° - trigone ${tr.orbs.trig}° - opposition ${tr.orbs.oppo}°\n`;
-    out += `\nPLANÈTES TRANSITANTES (maison = maison natale Placidus)\n`;
-    for (const T of tr.transiting){
-      const f = fmtPos(T.lon);
-      out += `${pad(T.name, 20)} ${f.text} ${pad(f.sign, 11)} `
-           + `Mnat:${pad(T.houseP ? HOUSE_ROMAN[T.houseP-1] : '-', 4)}`
-           + `${T.retro ? 'R' : ' '}  ${T.speed >= 0 ? '+' : ''}${T.speed.toFixed(4)}°/j\n`;
-    }
-    out += `\nASPECTS DE TRANSIT AUX POINTS NATALS\n`;
-    if (!tr.aspects.length){
-      out += `(aucun dans les orbes choisis)\n`;
-    } else {
-      for (const a2 of tr.aspects){
-        const dv = devToDMS(a2.dev);
-        out += `${pad(a2.t.name, 16)} ${pad(a2.asp.name, 12)} `
-             + `${pad('natal ' + a2.n.name, 22)} ${pad(dv.text, 7)} ${a2.phase}\n`;
-      }
+  if (tr){ out += `\n${'-'.repeat(52)}\n\n` + transitBlockText(tr); }
+  return out;
+}
+
+function transitBlockText(tr){
+  const t = tr.input;
+  const tdate = `${String(t.da).padStart(2,'0')}/${String(t.mo).padStart(2,'0')}/${t.y}`;
+  const ttime = `${String(t.hh).padStart(2,'0')}:${String(t.mi).padStart(2,'0')}`;
+  const ttz = (t.tz >= 0 ? '+' : '') + t.tz;
+  let out = `TRANSITS pour le ${tdate} ${ttime} (UTC${ttz})\n`;
+  out += `Orbes : conjonction ${tr.orbs.conj}° - sextile ${tr.orbs.sext}° - carré ${tr.orbs.squa}° - trigone ${tr.orbs.trig}° - opposition ${tr.orbs.oppo}°\n`;
+  out += `\nPLANÈTES TRANSITANTES (maison = maison natale Placidus)\n`;
+  for (const T of tr.transiting){
+    const f = fmtPos(T.lon);
+    out += `${pad(T.name, 20)} ${f.text} ${pad(f.sign, 11)} `
+         + `Mnat:${pad(T.houseP ? HOUSE_ROMAN[T.houseP-1] : '-', 4)}`
+         + `${T.retro ? 'R' : ' '}  ${T.speed >= 0 ? '+' : ''}${T.speed.toFixed(4)}°/j\n`;
+  }
+  out += `\nASPECTS DE TRANSIT AUX POINTS NATALS\n`;
+  if (!tr.aspects.length){
+    out += `(aucun dans les orbes choisis)\n`;
+  } else {
+    for (const a2 of tr.aspects){
+      const dv = devToDMS(a2.dev);
+      out += `${pad(a2.t.name, 16)} ${pad(a2.asp.name, 12)} `
+           + `${pad('natal ' + a2.n.name, 22)} ${pad(dv.text, 7)} ${a2.phase}\n`;
     }
   }
   return out;
@@ -1543,24 +1681,27 @@ function buildCsv(c, tr){
     out += `\n` + [a.a.name, a.asp.name, a.asp.angle, a.b.name, dv.d, dv.m, a.dev.toFixed(4), a.phase].join(',');
   }
 
-  // Blocs transits (si calculés)
-  if (tr){
-    const t = tr.input;
-    const tdate = `${String(t.da).padStart(2,'0')}/${String(t.mo).padStart(2,'0')}/${t.y}`;
-    const ttime = `${String(t.hh).padStart(2,'0')}:${String(t.mi).padStart(2,'0')}`;
-    const ttz = (t.tz >= 0 ? '+' : '') + t.tz;
-    out += `\n\nTRANSITS,${tdate} ${ttime},UTC${ttz}`;
-    out += `\n\nPlanete_transit,Longitude,Signe,Deg,Min,Sec,Maison_natale_Placidus,Retrograde,Vitesse_deg_j`;
-    for (const T of tr.transiting){
-      const p = splitDeg(T.lon);
-      out += `\n` + [T.name, T.lon.toFixed(6), SIGNS[p.signIdx], p.d, p.m, p.s,
-                     T.houseP ? HOUSE_ROMAN[T.houseP-1] : '', T.retro ? 'oui' : 'non', T.speed.toFixed(6)].join(',');
-    }
-    out += `\n\nCorps_transit,Aspect,Angle,Point_natal,Ecart_deg,Ecart_min,Ecart_decimal,Phase`;
-    for (const a of tr.aspects){
-      const dv = devToDMS(a.dev);
-      out += `\n` + [a.t.name, a.asp.name, a.asp.angle, a.n.name, dv.d, dv.m, a.dev.toFixed(4), a.phase].join(',');
-    }
+  // Bloc transits (si calculés)
+  if (tr){ out += `\n\n` + transitBlockCsv(tr); }
+  return out;
+}
+
+function transitBlockCsv(tr){
+  const t = tr.input;
+  const tdate = `${String(t.da).padStart(2,'0')}/${String(t.mo).padStart(2,'0')}/${t.y}`;
+  const ttime = `${String(t.hh).padStart(2,'0')}:${String(t.mi).padStart(2,'0')}`;
+  const ttz = (t.tz >= 0 ? '+' : '') + t.tz;
+  let out = `TRANSITS,${tdate} ${ttime},UTC${ttz}`;
+  out += `\n\nPlanete_transit,Longitude,Signe,Deg,Min,Sec,Maison_natale_Placidus,Retrograde,Vitesse_deg_j`;
+  for (const T of tr.transiting){
+    const p = splitDeg(T.lon);
+    out += `\n` + [T.name, T.lon.toFixed(6), SIGNS[p.signIdx], p.d, p.m, p.s,
+                   T.houseP ? HOUSE_ROMAN[T.houseP-1] : '', T.retro ? 'oui' : 'non', T.speed.toFixed(6)].join(',');
+  }
+  out += `\n\nCorps_transit,Aspect,Angle,Point_natal,Ecart_deg,Ecart_min,Ecart_decimal,Phase`;
+  for (const a of tr.aspects){
+    const dv = devToDMS(a.dev);
+    out += `\n` + [a.t.name, a.asp.name, a.asp.angle, a.n.name, dv.d, dv.m, a.dev.toFixed(4), a.phase].join(',');
   }
   return out;
 }
@@ -1589,31 +1730,280 @@ function buildJson(c, tr){
       return { corps_a:a.a.name, aspect:a.asp.name, angle:a.asp.angle, corps_b:a.b.name,
                ecart:{ deg:dv.d, min:dv.m, decimal:+a.dev.toFixed(4) }, phase:a.phase };
     }),
-    ...(tr ? { transits:{
-      entree: tr.input,
-      jour_julien: tr.jd,
-      orbes: tr.orbs,
-      planetes: tr.transiting.map(T => ({ nom:T.name, ...dms(T.lon),
-                    maison_natale_placidus:roman(T.houseP),
-                    retrograde:T.retro, vitesse_deg_jour:+T.speed.toFixed(6) })),
-      aspects_aux_points_natals: tr.aspects.map(a => {
-        const dv = devToDMS(a.dev);
-        return { corps_transit:a.t.name, aspect:a.asp.name, angle:a.asp.angle, point_natal:a.n.name,
-                 ecart:{ deg:dv.d, min:dv.m, decimal:+a.dev.toFixed(4) }, phase:a.phase };
-      })
-    } } : {})
+    ...(tr ? { transits: transitJsonObj(tr) } : {})
   }, null, 2);
 }
 
-function currentExport(){
-  if (!lastChart) return '';
-  if (exportFmt === 'csv')  return buildCsv(lastChart, lastTransits);
-  if (exportFmt === 'json') return buildJson(lastChart, lastTransits);
-  return buildText(lastChart, lastTransits);
+// ===== Export par onglet =====
+function transitJsonObj(tr){
+  const dms = lon => { const p = splitDeg(lon); return { longitude:+lon.toFixed(6), signe:SIGNS[p.signIdx], deg:p.d, min:p.m, sec:p.s }; };
+  const roman = h => h ? HOUSE_ROMAN[h-1] : null;
+  return {
+    entree: tr.input, jour_julien: tr.jd, orbes: tr.orbs,
+    planetes: tr.transiting.map(T => ({ nom:T.name, ...dms(T.lon), maison_natale_placidus:roman(T.houseP), retrograde:T.retro, vitesse_deg_jour:+T.speed.toFixed(6) })),
+    aspects_aux_points_natals: tr.aspects.map(a => { const dv = devToDMS(a.dev); return { corps_transit:a.t.name, aspect:a.asp.name, angle:a.asp.angle, point_natal:a.n.name, ecart:{ deg:dv.d, min:dv.m, decimal:+a.dev.toFixed(4) }, phase:a.phase }; })
+  };
 }
-function refreshExport(){ $('#exportText').textContent = currentExport(); }
+function rsTitle(c){ return `RÉVOLUTION SOLAIRE ${c.rsYear}${c.rsPrecessed ? ' (précessée)' : ''}`; }
+
+function prevText(){
+  const parts = [];
+  if (lastTransits) parts.push(transitBlockText(lastTransits));
+  if (lastReturn)   parts.push(buildText(lastReturn, null, rsTitle(lastReturn)));
+  return parts.length ? parts.join(`\n${'='.repeat(52)}\n\n`) : '(Aucune prévision calculée.)';
+}
+function prevCsv(){
+  const parts = [];
+  if (lastTransits) parts.push(transitBlockCsv(lastTransits));
+  if (lastReturn)   parts.push(rsTitle(lastReturn) + `\n` + buildCsv(lastReturn, null));
+  return parts.length ? parts.join(`\n\n`) : '(Aucune prévision calculée.)';
+}
+function prevJson(){
+  const o = {};
+  if (lastTransits) o.transits = transitJsonObj(lastTransits);
+  if (lastReturn)   o.revolution_solaire = JSON.parse(buildJson(lastReturn, null));
+  return JSON.stringify(o, null, 2);
+}
+
+function dashaText(){
+  if (!lastDasha) return '(Dasha non calculé.)';
+  const { sm, v, ayanName, topo, adj, yearDays } = lastDasha;
+  const z2 = n => String(n).padStart(2,'0');
+  const sp = splitDeg(sm.lon);
+  const adjTxt = adj ? ` ${adj > 0 ? '+' : ''}${adj}"` : '';
+  let out = `PÉRIODES VÉDIQUES — VIMSHOTTARI DASHA\n`;
+  out += `Lune sidérale ${sp.d}°${z2(sp.m)}'${z2(sp.s)}" ${SIGNS[sp.signIdx]}  (ayanamsa ${ayanName}${adjTxt} ${sm.ayan.toFixed(3)}°, ${topo ? 'topocentrique' : 'géocentrique'})\n`;
+  out += `Nakshatra ${v.nakshatra} (pada ${v.pada}) — seigneur de naissance ${v.lord0} — solde ${durLabel(v.balance, yearDays)} / ${v.yr0} ans\n`;
+  out += `Année védique : ${yearDays} jours\n${'-'.repeat(52)}\n`;
+  for (const m of v.mahas){
+    out += `\n${m.lord}   ${fmtDasha(m.start)} → ${fmtDasha(m.end)}   (${m.years} ans)\n`;
+    for (const b of m.children){
+      out += `   ${m.lord}/${b.lord}   ${fmtDasha(b.start)} → ${fmtDasha(b.end)}\n`;
+      for (const pr of b.children){
+        out += `      ${m.lord}/${b.lord}/${pr.lord}   ${fmtDasha(pr.start)} → ${fmtDasha(pr.end)}\n`;
+      }
+    }
+  }
+  return out;
+}
+function dashaCsv(){
+  if (!lastDasha) return '(Dasha non calculé.)';
+  const { v } = lastDasha;
+  const rows = [['Niveau','Maha','Bhukti','Pratyantara','Debut','Fin','Duree_ans']];
+  for (const m of v.mahas){
+    rows.push(['Maha', m.lord, '', '', fmtDasha(m.start), fmtDasha(m.end), m.years.toFixed(4)]);
+    for (const b of m.children){
+      rows.push(['Bhukti', m.lord, b.lord, '', fmtDasha(b.start), fmtDasha(b.end), b.years.toFixed(4)]);
+      for (const pr of b.children){
+        rows.push(['Pratyantara', m.lord, b.lord, pr.lord, fmtDasha(pr.start), fmtDasha(pr.end), pr.years.toFixed(4)]);
+      }
+    }
+  }
+  return rows.map(r => r.join(',')).join('\n');
+}
+function dashaJson(){
+  if (!lastDasha) return '{}';
+  const { sm, v, ayanName, topo, adj, yearDays } = lastDasha;
+  const sp = splitDeg(sm.lon);
+  return JSON.stringify({
+    lune_siderale: { longitude:+sm.lon.toFixed(6), signe:SIGNS[sp.signIdx], deg:sp.d, min:sp.m, sec:sp.s },
+    ayanamsa: { nom:ayanName, ajustement_sec:adj, valeur_deg:+sm.ayan.toFixed(5), centre: topo ? 'topocentrique' : 'geocentrique' },
+    annee_vedique_jours: yearDays,
+    nakshatra: v.nakshatra, pada: v.pada, seigneur_naissance: v.lord0, solde_ans: +v.balance.toFixed(4),
+    mahadashas: v.mahas.map(m => ({ seigneur:m.lord, debut:fmtDasha(m.start), fin:fmtDasha(m.end), duree_ans:+m.years.toFixed(4),
+      bhuktis: m.children.map(b => ({ seigneur:b.lord, debut:fmtDasha(b.start), fin:fmtDasha(b.end), duree_ans:+b.years.toFixed(4),
+        pratyantardashas: b.children.map(pr => ({ seigneur:pr.lord, debut:fmtDasha(pr.start), fin:fmtDasha(pr.end), duree_ans:+pr.years.toFixed(4) })) })) }))
+  }, null, 2);
+}
+
+function exportContent(scope){
+  const f = exportFmt[scope];
+  if (scope === 'theme'){ if (!lastChart) return ''; return f === 'csv' ? buildCsv(lastChart, null) : f === 'json' ? buildJson(lastChart, null) : buildText(lastChart, null); }
+  if (scope === 'prev')  return f === 'csv' ? prevCsv() : f === 'json' ? prevJson() : prevText();
+  if (scope === 'vedic') return f === 'csv' ? dashaCsv() : f === 'json' ? dashaJson() : dashaText();
+  return '';
+}
+function refreshExportScope(scope){
+  const blk = document.getElementById('export-' + scope); if (!blk) return;
+  const pre = blk.querySelector('pre'); if (pre) pre.textContent = exportContent(scope);
+}
+function refreshAllExports(){ ['theme','prev','vedic'].forEach(refreshExportScope); }
+
+/* ========== Vimshottari Dasha (astrologie védique, sidéral Lahiri) ==========
+   Lune sidérale -> nakshatra -> seigneur de départ -> solde de la 1re Mahadasha,
+   puis séquence fixe sur 120 ans, subdivisée en Bhuktis et Pratyantardashas. */
+const VIM_SEQ = [['Ketu',7],['Vénus',20],['Soleil',6],['Lune',10],['Mars',7],
+                 ['Rahu',18],['Jupiter',16],['Saturne',19],['Mercure',17]];
+const VIM_TOTAL = 120;
+const VIM_YEARDAYS = 365.25;   // durée de l'année védique (convention retenue)
+const VIM_AYAN  = { '1':'Lahiri', '0':'Fagan/Bradley', '3':'Raman', '5':'Krishnamurti' };
+const NAKSHATRAS = [
+  'Ashwini','Bharani','Krittika','Rohini','Mrigashira','Ardra','Punarvasu','Pushya','Ashlesha',
+  'Magha','Purva Phalguni','Uttara Phalguni','Hasta','Chitra','Swati','Vishakha','Anuradha','Jyeshtha',
+  'Mula','Purva Ashadha','Uttara Ashadha','Shravana','Dhanishta','Shatabhisha',
+  'Purva Bhadrapada','Uttara Bhadrapada','Revati'];
+
+// Lune en zodiaque sidéral. ayanId = code Swiss Ephemeris (0 Fagan/Bradley, 1 Lahiri, 3 Raman, 5 Krishnamurti).
+// topo = true : position topocentrique (corrigée de la parallaxe lunaire au lieu de naissance) ;
+//        false : géocentrique (depuis le centre de la Terre, convention habituelle du Jyotish).
+// Renvoie { lon, ayan } (ayan dérivé = longitude tropicale - sidérale, calculées dans le même repère).
+function siderealMoon(jd, ayanId, topo, lat, lon, adjArcsec){
+  let flags = swe.SEFLG_SWIEPH;
+  if (topo && swe.set_topo && swe.SEFLG_TOPOCTR !== undefined){
+    swe.set_topo(lon, lat, 0);           // longitude est +, latitude nord + ; altitude 0 m
+    flags |= swe.SEFLG_TOPOCTR;
+  }
+  const trop = sweCalcUT(jd, swe.SE_MOON, flags).longitude;
+  if (swe.set_sid_mode) swe.set_sid_mode(ayanId, 0, 0);
+  let sid = sweCalcUT(jd, swe.SE_MOON, flags | swe.SEFLG_SIDEREAL).longitude;
+  // Ajustement d'ayanamsa (en secondes d'arc) : + = ayanamsa plus grand -> Lune reculée.
+  // C'est un décalage de point zéro, donc constant pour toutes les dates de naissance.
+  const adj = (adjArcsec || 0) / 3600;
+  sid = (((sid - adj) % 360) + 360) % 360;
+  const ayan = (((trop - sid) % 360) + 360) % 360;
+  return { lon: sid, ayan };
+}
+
+// Jour Julien -> date grégorienne (algorithme de Richards). Renvoie {y,mo,da}.
+function jdToGreg(jd){
+  const J = Math.floor(jd + 0.5);
+  let f = J + 1401 + Math.floor((Math.floor((4*J+274277)/146097)*3)/4) - 38;
+  const e = 4*f + 3;
+  const g = Math.floor((e % 1461) / 4);
+  const h = 5*g + 2;
+  const da = Math.floor((h % 153) / 5) + 1;
+  const mo = ((Math.floor(h/153) + 2) % 12) + 1;
+  const y  = Math.floor(e/1461) - 4716 + Math.floor((12 + 2 - mo) / 12);
+  return { y, mo, da };
+}
+function fmtDasha(jd){ const d = jdToGreg(jd); return `${String(d.da).padStart(2,'0')}/${String(d.mo).padStart(2,'0')}/${d.y}`; }
+
+// Construit l'arbre des périodes à partir de la Lune sidérale, du JD de naissance
+// et de la convention de durée de l'année (yearDays : 365,25 / 360 / 365,2422…).
+function buildVimshottari(moonSidLon, birthJd, yearDays){
+  const nakWidth = 360/27;
+  const ni = Math.floor(moonSidLon / nakWidth);
+  const within = moonSidLon - ni*nakWidth;
+  const frac = within / nakWidth;                 // fraction du nakshatra déjà parcourue
+  const pada = Math.floor(within / (nakWidth/4)) + 1;
+  const lordIdx = ni % 9;
+  const [lord0, yr0] = VIM_SEQ[lordIdx];
+
+  // Début de la 1re Mahadasha = naissance - part déjà écoulée.
+  let start = birthJd - frac * yr0 * yearDays;
+
+  const nest = (startJd, lordName, years, depth) => {
+    const i0 = VIM_SEQ.findIndex(x => x[0] === lordName);
+    const out = []; let s = startJd;
+    for (let k = 0; k < 9; k++){
+      const [L, Ly] = VIM_SEQ[(i0 + k) % 9];
+      const length = years * Ly / VIM_TOTAL;       // en années
+      const e = s + length * yearDays;
+      out.push({ lord:L, years:length, start:s, end:e,
+                 children: depth > 0 ? nest(s, L, length, depth-1) : [] });
+      s = e;
+    }
+    return out;
+  };
+
+  const mahas = [];
+  let s = start;
+  for (let k = 0; k < 9; k++){
+    const [L, Ly] = VIM_SEQ[(lordIdx + k) % 9];
+    const e = s + Ly * yearDays;
+    mahas.push({ lord:L, years:Ly, start:s, end:e, children: nest(s, L, Ly, 1) });
+    s = e;
+  }
+  return { nakshatra:NAKSHATRAS[ni], nakIndex:ni, pada, lord0, yr0, frac,
+           balance:(1-frac)*yr0, mahas };
+}
+
+function findActive(nodes, nowJd){
+  for (const n of nodes) if (nowJd >= n.start && nowJd < n.end) return n;
+  return null;
+}
+function durLabel(years, yearDays){
+  if (years >= 1) { const y=Math.floor(years), m=Math.round((years-y)*12);
+    return m ? `${y} a ${m} m` : `${y} a`; }
+  const days = Math.round(years*yearDays);
+  return `${days} j`;
+}
+
+function renderDasha(c){
+  const ayanId   = parseInt($('#dashaAyan').value, 10);
+  const yearDays = VIM_YEARDAYS;
+  const topo     = $('#dashaParallax').value === '1';
+  const adj      = parseFloat($('#dashaAdj').value) || 0;
+  const ayanName = VIM_AYAN[String(ayanId)] || 'Lahiri';
+
+  const sm = siderealMoon(c.jd, ayanId, topo, c.input.lat, c.input.lon, adj);
+  const v  = buildVimshottari(sm.lon, c.jd, yearDays);
+  lastDasha = { sm, v, ayanName, topo, adj, yearDays };
+
+  const pad2 = n => String(n).padStart(2, '0');
+  const sp = splitDeg(sm.lon);
+  const adjTxt = adj ? ` ${adj > 0 ? '+' : ''}${adj}″` : '';
+  $('#dashaMoon').innerHTML =
+    `<b>Lune sidérale</b> ${sp.d}°${pad2(sp.m)}′${pad2(sp.s)}″ ${SIGNS[sp.signIdx]} `
+    + `(ayanamsa ${ayanName}${adjTxt} ${sm.ayan.toFixed(3)}° · ${topo ? 'topocentrique' : 'géocentrique'}) — `
+    + `nakshatra <b>${v.nakshatra}</b> (pada ${v.pada}), `
+    + `seigneur <b>${v.lord0}</b>. Solde à la naissance : ${durLabel(v.balance, yearDays)} sur ${v.yr0} ans.`;
+
+  // Période en cours (3 niveaux). Instant présent en Temps Universel.
+  const d = new Date();
+  const now = swe.julday(d.getUTCFullYear(), d.getUTCMonth()+1, d.getUTCDate(),
+                         d.getUTCHours() + d.getUTCMinutes()/60 + d.getUTCSeconds()/3600);
+  const curM = findActive(v.mahas, now);
+  let nowHtml = '';
+  if (curM){
+    const curB = findActive(curM.children, now);
+    const curP = curB ? findActive(curB.children, now) : null;
+    const chain = [curM.lord, curB && curB.lord, curP && curP.lord].filter(Boolean).join(' › ');
+    const end = curP ? curP.end : (curB ? curB.end : curM.end);
+    nowHtml = `<span class="dn-label">Période en cours</span>`
+      + `<span class="dn-chain">${chain}</span> `
+      + `<span class="dn-dates">— jusqu'au ${fmtDasha(end)}</span>`;
+  } else {
+    nowHtml = `<span class="dn-label">Période en cours</span>`
+      + `<span class="dn-dates">hors de la fenêtre de 120 ans à partir de la naissance.</span>`;
+  }
+  $('#dashaNow').innerHTML = nowHtml;
+
+  // Tableau dépliable
+  const praty = (p) => {
+    const on = (now >= p.start && now < p.end) ? ' is-now' : '';
+    return `<div class="praty-row${on}"><span class="dasha-lord">${p.lord}</span>`
+      + `<span class="dasha-dates">${fmtDasha(p.start)} → ${fmtDasha(p.end)}</span>`
+      + `<span class="dasha-dur">${durLabel(p.years, yearDays)}</span></div>`;
+  };
+  const bhukti = (b) => {
+    const on = (now >= b.start && now < b.end) ? ' is-now' : '';
+    return `<details class="bhukti dasha-node${on}"><summary>`
+      + `<span class="dasha-lord">${b.lord}</span>`
+      + `<span class="dasha-dates">${fmtDasha(b.start)} → ${fmtDasha(b.end)}</span>`
+      + `<span class="dasha-dur">${durLabel(b.years, yearDays)}</span></summary>`
+      + `<div class="bhukti-inner">${b.children.map(praty).join('')}</div></details>`;
+  };
+  const maha = (m) => {
+    const on = (now >= m.start && now < m.end) ? ' is-now' : '';
+    return `<details class="maha dasha-node${on}"><summary>`
+      + `<span class="dasha-lord">${m.lord}</span>`
+      + `<span class="dasha-dates">${fmtDasha(m.start)} → ${fmtDasha(m.end)}</span>`
+      + `<span class="dasha-dur">${m.years} ans</span></summary>`
+      + `<div class="maha-inner">${m.children.map(bhukti).join('')}</div></details>`;
+  };
+  $('#dashaBody').innerHTML = v.mahas.map(maha).join('');
+}
 
 /* ---------- Événements ---------- */
+// Recalcule le Dasha quand on change l'ayanamsa ou la durée de l'année.
+['#dashaAyan', '#dashaParallax', '#dashaAdj'].forEach(sel => {
+  const ev = sel === '#dashaAdj' ? 'input' : 'change';
+  $(sel).addEventListener(ev, () => {
+    if (lastChart) { try { renderDasha(lastChart); refreshExportScope('vedic'); } catch (e){ console.error(e); } }
+  });
+});
+
 $('#calc').addEventListener('click', () => {
   if (!ready){ status.textContent = 'Le moteur n\'est pas encore prêt.'; status.classList.add('err'); return; }
   try {
@@ -1626,7 +2016,9 @@ $('#calc').addEventListener('click', () => {
     $('#wheelCard').hidden = false;
     $('#dignitiesCard').hidden = false;
     $('#aspectsCard').hidden = false;
-    $('#exportCard').hidden = false;
+    try { renderDasha(lastChart); $('#dashaCard').hidden = false; }
+    catch (e){ /* le Dasha ne doit jamais masquer le thème natal */ console.error(e); }
+    $('#resultsArea').hidden = false;
     // Transits : par défaut, le ciel du moment. On ne calcule que si les champs sont valides.
     if (!$('#trDate').value || !$('#trTime').value) fillTransitNow();
     try {
@@ -1634,13 +2026,14 @@ $('#calc').addEventListener('click', () => {
       renderTransits(lastTransits);
       $('#transitsCard').hidden = false;
     } catch (e){ /* une date de transit invalide ne doit pas masquer le thème natal */ }
-    refreshExport();   // après les transits, pour qu'ils figurent dans l'export
+    // (les exports sont rafraîchis en fin de calcul)
     // Révolution solaire : par défaut, celle de l'année courante au lieu de naissance.
     fillReturnDefaults();
     try { runReturn(); } catch (e){ /* ne doit pas masquer le thème natal */ }
     // Série de RS : révéler la carte et pré-remplir la plage (naissance -> aujourd'hui).
     fillSeriesDefaults();
     $('#seriesCard').hidden = false;
+    refreshAllExports();
     status.textContent = 'Thème calculé.';
     status.classList.remove('err');
   } catch (e){
@@ -1650,35 +2043,48 @@ $('#calc').addEventListener('click', () => {
   }
 });
 
-// Sélecteur format d'export
-document.querySelectorAll('.seg [data-fmt]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.seg [data-fmt]').forEach(b => b.setAttribute('aria-pressed','false'));
-    btn.setAttribute('aria-pressed','true');
-    exportFmt = btn.dataset.fmt;
-    refreshExport();
+// ===== Onglets =====
+let activeTab = 'theme';
+function selectTab(name){
+  activeTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+  document.querySelectorAll('.tabpanel').forEach(pan => { pan.hidden = (pan.dataset.panel !== name); });
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+
+// ===== Export : format / copie / téléchargement, par onglet =====
+document.querySelectorAll('.export-block .seg').forEach(seg => {
+  const scope = seg.dataset.seg;
+  seg.querySelectorAll('[data-fmt]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      seg.querySelectorAll('[data-fmt]').forEach(b => b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      exportFmt[scope] = btn.dataset.fmt;
+      refreshExportScope(scope);
+    });
   });
 });
-
-// Copier
-$('#copyBtn').addEventListener('click', async () => {
-  const text = currentExport(); if (!text) return;
-  try { await navigator.clipboard.writeText(text); }
-  catch { const r = document.createRange(); r.selectNode($('#exportText')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); }
-  const b = $('#copyBtn'); b.textContent = 'Copié'; b.classList.add('copied');
-  setTimeout(() => { b.textContent = 'Copier'; b.classList.remove('copied'); }, 1600);
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const scope = btn.dataset.copy; const text = exportContent(scope); if (!text) return;
+    const pre = document.getElementById('export-' + scope).querySelector('pre');
+    try { await navigator.clipboard.writeText(text); }
+    catch { const r = document.createRange(); r.selectNode(pre); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); }
+    btn.textContent = 'Copié'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 1600);
+  });
 });
-
-// Télécharger
-$('#dlBtn').addEventListener('click', () => {
-  const text = currentExport(); if (!text) return;
-  const ext = exportFmt; const type = ext === 'json' ? 'application/json' : ext === 'csv' ? 'text/csv' : 'text/plain';
-  const blob = new Blob([text], { type: type + ';charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `astroguide.${ext}`;
-  document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+document.querySelectorAll('[data-dl]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const scope = btn.dataset.dl; const text = exportContent(scope); if (!text) return;
+    const ext = exportFmt[scope]; const type = ext === 'json' ? 'application/json' : ext === 'csv' ? 'text/csv' : 'text/plain';
+    const blob = new Blob([text], { type: type + ';charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `astroguide-${scope}.${ext}`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
 });
 
 /* ---------- Recherche de ville (géocodage Open-Meteo, gratuit, sans clé) ---------- */
@@ -1793,6 +2199,32 @@ function fillNow(){
   if (cityHint) cityHint.textContent = 'Position et heure actuelles à Paris. Modifiable.';
 }
 
+/* ---------- Bouton « Effacer » : vide le formulaire et masque les résultats ---------- */
+function clearForm(){
+  // Champs de naissance
+  ['#name','#date','#time','#city','#tz','#lat','#lon'].forEach(sel => { $(sel).value = ''; });
+  cityResults.hidden = true; cityResults.innerHTML = '';
+  cityHint.textContent = 'Remplit automatiquement les coordonnées et le décalage horaire.';
+  // Champs dérivés du thème précédent (re-remplis automatiquement au prochain calcul)
+  ['#trDate','#trTime','#trTz','#rsYear','#rsCity','#rsLat','#rsLon',
+   '#serFrom','#serTo','#serCity','#serLat','#serLon'].forEach(sel => { $(sel).value = ''; });
+  ['#rsCityResults','#serCityResults'].forEach(sel => { $(sel).hidden = true; $(sel).innerHTML = ''; });
+  // Résultats
+  lastChart = lastTransits = lastReturn = lastDasha = lastSeries = null;
+  ['#wheel','#dignitiesBody','#aspectsBody','#transitsBody','#returnBody','#seriesBody',
+   '#dashaMoon','#dashaNow','#dashaBody'].forEach(sel => { $(sel).innerHTML = ''; });
+  $('#results').innerHTML = '<div class="empty">Renseignez les données puis lancez le calcul.</div>';
+  ['#wheelCard','#dignitiesCard','#aspectsCard','#dashaCard','#transitsCard','#returnCard','#seriesCard',
+   '#resultsArea'].forEach(sel => { $(sel).hidden = true; });
+  $('#serDlLong').disabled = true; $('#serDlWide').disabled = true;
+  document.querySelectorAll('.export-block pre').forEach(pre => { pre.textContent = ''; });
+  selectTab('theme');
+  status.textContent = 'Formulaire effacé.';
+  status.classList.remove('err');
+  $('#name').focus();
+}
+$('#clear').addEventListener('click', clearForm);
+
 $('#now').addEventListener('click', () => {
   fillNow();
   if (ready) $('#calc').click();
@@ -1818,7 +2250,7 @@ function runTransits(){
     lastTransits = computeTransits();
     renderTransits(lastTransits);
     $('#transitsCard').hidden = false;
-    refreshExport();   // garder l'export synchronisé avec la nouvelle date de transit
+    refreshExportScope('prev');   // garder l'export Prévisions synchronisé
   } catch (e){
     $('#transitsBody').innerHTML = `<div class="empty" style="color:var(--rust);padding:16px">${e.message}</div>`;
   }
