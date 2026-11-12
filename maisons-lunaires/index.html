@@ -129,8 +129,19 @@
 
 <script>
 if ('serviceWorker' in navigator) {
+  // Recharge une fois quand une nouvelle version prend la main.
+  var hadController = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if (hadController && !reloaded) { reloaded = true; location.reload(); }
+    hadController = true;
+  });
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(e){ console.warn('SW non enregistré', e); });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function(reg){
+      // Sur iPhone l'app sort de veille sans se recharger : on vérifie la mise à jour à chaque retour.
+      document.addEventListener('visibilitychange', function(){
+        if (document.visibilityState === 'visible') reg.update();
+      });
+    }).catch(function(e){ console.warn('SW non enregistré', e); });
   });
 }
 </script>
