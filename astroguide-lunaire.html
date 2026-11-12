@@ -45,20 +45,27 @@
   .util{display:inline-flex; align-items:center; gap:8px; user-select:none}
   .util input{accent-color:var(--rouge)}
 
-  .cols{display:grid; grid-template-columns:1fr 1fr; gap:22px}
-  @media(max-width:760px){.cols{grid-template-columns:1fr}}
-  .col h2{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:18px; margin:0 0 8px}
-  table{width:100%; border-collapse:collapse; font-size:13.5px}
-  th{text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--gris);
-     font-weight:600; padding:0 8px 8px; border-bottom:1px solid var(--trait)}
-  td{padding:9px 8px; border-bottom:1px solid var(--surface); vertical-align:middle}
-  tr:last-child td{border-bottom:none}
-  .n{font-family:'Spectral',Georgia,serif; font-weight:600; color:var(--rouge); font-size:16px; width:2.2em}
-  .dt{white-space:nowrap; color:var(--encre); font-variant-numeric:tabular-nums}
+  .tcard .until{font-size:12.5px; color:var(--gris); margin-top:8px}
   .badge{display:inline-block; font-size:12px; font-weight:600; border-radius:6px; padding:2px 9px}
 
-  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin:14px 0 0; font-size:12px; color:var(--gris)}
+  .legend{display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 6px; font-size:12px; color:var(--gris)}
   .legend .badge{font-size:11px}
+
+  /* Frise chronologique du mois */
+  .timeline{margin-top:4px}
+  .dayhead{font-family:'Spectral',Georgia,serif; font-weight:600; font-size:15px; color:var(--rouge);
+    padding:16px 0 6px; border-bottom:1px solid var(--trait); margin-bottom:2px}
+  .dayhead::first-letter{text-transform:uppercase}
+  .ev{display:flex; align-items:center; gap:12px; padding:7px 0 7px 10px; border-bottom:1px solid var(--surface);
+    border-left:3px solid transparent}
+  .ev:last-child{border-bottom:none}
+  .ev .time{font-variant-numeric:tabular-nums; color:var(--gris); font-size:13.5px; width:44px; flex:none}
+  .chip{font-size:12.5px; font-weight:600; padding:3px 11px; border-radius:999px; white-space:nowrap}
+  .ev-dl .chip{background:#fff; color:var(--encre); border:1px solid var(--trait)}
+  .ev-dl .ctx{font-size:12.5px; color:var(--gris)}
+  .ev-ml .chip{color:#fff}
+  .ev-ml .chip .cat{font-weight:500}
+  .empty{color:var(--gris); font-size:13.5px; padding:16px 0}
 
   footer{margin-top:30px; color:var(--gris); font-size:12px; line-height:1.7; border-top:1px solid var(--trait); padding-top:16px}
   footer a{color:var(--rouge)}
@@ -84,19 +91,8 @@
       <label class="util"><input type="checkbox" id="utile"> Maisons favorables et neutres seulement</label>
     </div>
 
-    <div class="cols">
-      <div class="col">
-        <h2>Demeures lunaires</h2>
-        <table><thead><tr><th>DL</th><th>Début</th></tr></thead>
-        <tbody id="tbodyDL"></tbody></table>
-      </div>
-      <div class="col">
-        <h2>Maisons lunaires</h2>
-        <table><thead><tr><th>ML</th><th>Début</th><th>Catégorie</th></tr></thead>
-        <tbody id="tbodyML"></tbody></table>
-        <div class="legend" id="legend"></div>
-      </div>
-    </div>
+    <div class="legend" id="legend"></div>
+    <div id="timeline" class="timeline"></div>
   </div>
 
   <footer>
@@ -192,40 +188,70 @@ let cur = parisYM(new Date());
 let favNeutreOnly = false;
 function $(s){ return document.querySelector(s); }
 
+// Date de fin de la période en cours (premier changement de valeur après "from").
+function nextChange(fn, from, maxDays=4, stepMin=10){
+  let t=from.getTime(); const end=t+maxDays*864e5; const step=stepMin*60000;
+  let prev=fn(new Date(t));
+  while(t<end){
+    const t2=t+step; const cur=fn(new Date(t2));
+    if(cur!==prev && cur!=null && prev!=null){
+      let lo=t, hi=t2;
+      for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(fn(new Date(mid))===prev) lo=mid; else hi=mid; }
+      return new Date(hi);
+    }
+    if(cur!=null) prev=cur;
+    t=t2;
+  }
+  return null;
+}
+
 function renderToday(){
   const now=new Date();
   const nls=findNLs(new Date(now.getTime()-45*864e5), new Date(now.getTime()+45*864e5));
   const dl=demeure(now), ml=maison(now, nls);
   const ml_c=ML_CAT[ml];
+  const dlEnd=nextChange(demeure, now), mlEnd=nextChange(d=>maison(d,nls), now);
+  const until=end=> end ? `<div class="until">Jusqu'au ${parisDT(end)}</div>` : '';
   const mlon=moonLon(now); const sIdx=Math.floor(mlon/30); const deg=Math.floor(mlon-30*sIdx);
   const dlCard=`<div class="tcard"><div class="head"><span class="num">${dl}</span><span class="lab">Demeure du jour</span></div>
-     <div class="body"><span class="ctx">Lune à ${deg}° ${SIGNS[sIdx]}</span></div></div>`;
-  const mlCard=`<div class="tcard"><div class="head accent"><span class="num">${ml}</span><span class="lab">Maison du jour</span></div>
-     <div class="body">${badge(ml_c)}</div></div>`;
+     <div class="body"><span class="ctx">Lune à ${deg}° ${SIGNS[sIdx]}</span>${until(dlEnd)}</div></div>`;
+  const mlCard=`<div class="tcard"><div class="head accent" style="background:${CAT_COLOR[ml_c][1]}"><span class="num">${ml}</span><span class="lab">Maison du jour</span></div>
+     <div class="body">${badge(ml_c)}${until(mlEnd)}</div></div>`;
   $('#today').innerHTML = dlCard + mlCard;
 }
 
 function monthWindow(y,m){
   return { startUTC:new Date(Date.UTC(y, m-1, 1) - 2*864e5), endUTC:new Date(Date.UTC(y, m, 1) + 2*864e5) };
 }
+const dayFmt  = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', weekday:'long', day:'numeric', month:'long'});
+const timeFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris', hour:'2-digit', minute:'2-digit'});
+const dayKeyFmt = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris', year:'numeric', month:'2-digit', day:'2-digit'});
+
 function renderMonth(){
   $('#moisLabel').textContent = `${MOIS[cur.m-1]} ${cur.y}`;
   const {startUTC, endUTC}=monthWindow(cur.y, cur.m);
   const nls=findNLs(new Date(startUTC.getTime()-45*864e5), new Date(endUTC.getTime()+45*864e5));
   const inMonth=t=>{const p=parisYM(t.date); return p.y===cur.y && p.m===cur.m;};
-  const dlT=transitions(demeure, startUTC, endUTC).filter(inMonth);
-  const mlT=transitions(d=>maison(d,nls), startUTC, endUTC).filter(inMonth);
+  const dlT=transitions(demeure, startUTC, endUTC).filter(inMonth).map(t=>({date:t.date, val:t.val, type:'DL'}));
+  const mlT=transitions(d=>maison(d,nls), startUTC, endUTC).filter(inMonth).map(t=>({date:t.date, val:t.val, type:'ML'}))
+    .filter(t=>{ const c=ML_CAT[t.val]; return !favNeutreOnly || c==='favorable' || c==='neutre'; });
+  const evs=dlT.concat(mlT).sort((a,b)=>a.date-b.date);
 
-  $('#tbodyDL').innerHTML = dlT.map(t=>
-      `<tr><td class="n">${t.val}</td><td class="dt">${parisDT(t.date)}</td></tr>`).join('')
-      || `<tr><td colspan="2" class="sg">Aucune entrée ce mois-ci.</td></tr>`;
+  if(!evs.length){ $('#timeline').innerHTML=`<div class="empty">Aucune entrée ce mois-ci.</div>`; postHeight(); return; }
 
-  const mlRows = mlT.map(t=>{
-      const c=ML_CAT[t.val];
-      if(favNeutreOnly && !(c==='favorable'||c==='neutre')) return '';
-      return `<tr><td class="n">${t.val}</td><td class="dt">${parisDT(t.date)}</td><td>${badge(c)}</td></tr>`;
-    }).join('');
-  $('#tbodyML').innerHTML = mlRows || `<tr><td colspan="3" class="sg">Aucune maison favorable ou neutre ce mois-ci.</td></tr>`;
+  let html='', curKey=null;
+  for(const e of evs){
+    const key=dayKeyFmt.format(e.date);
+    if(key!==curKey){ html+=`<div class="dayhead">${dayFmt.format(e.date)}</div>`; curKey=key; }
+    const time=`<span class="time">${timeFmt.format(e.date)}</span>`;
+    if(e.type==='ML'){
+      const c=ML_CAT[e.val], fg=CAT_COLOR[c][1];
+      html+=`<div class="ev ev-ml" style="border-left-color:${fg}">${time}<span class="chip" style="background:${fg}">Maison ${e.val} · <span class="cat">${c}</span></span></div>`;
+    } else {
+      html+=`<div class="ev ev-dl">${time}<span class="chip">Demeure ${e.val}</span></div>`;
+    }
+  }
+  $('#timeline').innerHTML = html;
   postHeight();
 }
 
@@ -236,7 +262,7 @@ function shift(delta){
 }
 
 function renderLegend(){
-  $('#legend').innerHTML = ['favorable','neutre','douteuse','mauvaise'].map(badge).join('');
+  $('#legend').innerHTML = 'Maisons : ' + ['favorable','neutre','douteuse','mauvaise'].map(badge).join('');
 }
 function postHeight(){
   const h=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
