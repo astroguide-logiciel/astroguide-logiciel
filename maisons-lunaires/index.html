@@ -70,12 +70,19 @@
     padding:8px 0; border-bottom:1px solid var(--surface)}
   .day .ev:last-child{border-bottom:none}
   .ev .time{font-variant-numeric:tabular-nums; color:var(--gris); font-size:13px}
-  .ev .chip{font-size:11.5px; font-weight:600; padding:2px 10px; border-radius:999px; white-space:nowrap; align-self:center}
-  .ev-dl .chip{background:var(--rouge-clair); color:var(--rouge-fonce)}
-  .ev-ml .chip{background:var(--rouge); color:#fff}
+  .ev .chip{font-size:11.5px; font-weight:600; padding:2px 10px; border-radius:999px; white-space:nowrap; align-self:center; justify-self:start}
+  .ev-dl .chip{background:#fff; color:var(--encre); border:1px solid var(--trait)}
+  .ev-ml .chip{color:#fff}
+  .ev-ml{border-left:3px solid var(--cat); padding-left:9px}
+  .ev .cat{font-weight:500; opacity:.92}
+  .catbadge{display:inline-block; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    padding:2px 9px; border-radius:999px; margin-bottom:6px}
+  .legend{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:0 0 4px; font-size:12px; color:var(--gris)}
+  .legend .catbadge{margin:0}
+  .legend-note{font-size:12px; color:var(--gris); margin:4px 0 0; line-height:1.5}
   .ev .sig{font-size:13px; color:var(--encre)}
   .ev.muted .sig{color:var(--gris-clair); font-style:italic}
-  .ev.muted .chip{opacity:.6}
+  .ev-dl.muted .chip{opacity:.6}
   @media(max-width:480px){
     .ev{grid-template-columns:50px 1fr; row-gap:3px}
     .ev .sig{grid-column:1 / -1}
@@ -107,6 +114,8 @@
       </div>
       <div class="mois" id="moisLabel"></div>
     </div>
+    <div class="legend" id="legend"></div>
+    <p class="legend-note">Selon Volguine, mieux vaut éviter de commencer une entreprise ou une démarche importante en maison <strong>douteuse</strong> ou <strong>mauvaise</strong>, et profiter des maisons <strong>favorables</strong> ou <strong>neutres</strong>.</p>
 
     <div id="timeline" class="timeline"></div>
   </div>
@@ -176,6 +185,23 @@ const ML_SIG = {
 27:"Éviter toute nouvelle entreprise.",
 28:"Ne rien entreprendre de nouveau.",
 };
+
+/* Catégories des maisons lunaires (Volguine) — reprises de l'outil du site */
+const ML_CAT = {};
+[['mauvaise',[1,9,10,15,19,20,28]],
+ ['douteuse',[2,6,14,18,23,27]],
+ ['neutre',[3,4,5,11,16,21,24,25,26]],
+ ['favorable',[7,8,12,13,17,22]]].forEach(([c,arr])=>arr.forEach(n=>ML_CAT[n]=c));
+const CAT_COLOR = {             // [fond clair, couleur forte]
+  favorable:['#e6f2ec','#1f7a4d'],
+  neutre:   ['#F1EEEC','#6B6460'],
+  douteuse: ['#FBE7D6','#B4552E'],
+  mauvaise: ['#F5E5E6','#A81C24'],
+};
+function catBadge(cat){
+  const [bg,fg]=CAT_COLOR[cat];
+  return `<span class="catbadge" style="background:${bg};color:${fg}">${cat}</span>`;
+}
 
 /* ---------- Moteur ---------- */
 let swe;
@@ -275,13 +301,16 @@ function renderToday(){
   const dl=demeure(now), ml=maison(now, nls);
   const dlEnd=nextChange(demeure, now);
   const mlEnd=nextChange(d=>maison(d,nls), now);
-  const card=(lab,n,sig,accent,end)=>{
+  const card=(lab,n,sig,end,cat)=>{
     const s=sig[n];
     const until = end ? `<div class="until">Jusqu'au ${parisDT(end)}</div>` : '';
-    return `<div class="tcard"><div class="head ${accent?'accent':''}"><span class="num">${n}</span><span class="lab">${lab} du jour</span></div>
-      <div class="body">${ s ? `<div class="sig">${s}</div>` : `<div class="none">Pas de signification particulière pour la vie quotidienne.</div>`}${until}</div></div>`;
+    // Maison : bandeau de la couleur de sa catégorie ; Demeure : bandeau clair habituel
+    const headStyle = cat ? ` style="background:${CAT_COLOR[cat][1]}"` : '';
+    const headCls = cat ? 'head accent' : 'head';
+    return `<div class="tcard"><div class="${headCls}"${headStyle}><span class="num">${n}</span><span class="lab">${lab} du jour</span></div>
+      <div class="body">${cat ? catBadge(cat) : ''}${ s ? `<div class="sig">${s}</div>` : `<div class="none">Pas de signification particulière pour la vie quotidienne.</div>`}${until}</div></div>`;
   };
-  $('#today').innerHTML = card('Demeure', dl, DL_SIG, false, dlEnd) + card('Maison', ml, ML_SIG, true, mlEnd);
+  $('#today').innerHTML = card('Demeure', dl, DL_SIG, dlEnd, null) + card('Maison', ml, ML_SIG, mlEnd, ML_CAT[ml]);
 }
 
 function monthWindow(y,m){
@@ -291,6 +320,7 @@ function monthWindow(y,m){
 }
 
 function renderMonth(){
+  $('#legend').innerHTML = 'Maisons : ' + ['favorable','neutre','douteuse','mauvaise'].map(catBadge).join('');
   $('#moisLabel').textContent = `${MOIS[cur.m-1]} ${cur.y}`;
   const {startUTC, endUTC}=monthWindow(cur.y, cur.m);
   const nls=findNLs(new Date(startUTC.getTime()-45*864e5), new Date(endUTC.getTime()+45*864e5));
@@ -314,11 +344,18 @@ function renderMonth(){
     }
     const sig=(e.type==='DL'?DL_SIG:ML_SIG)[e.val];
     const muted=!sig;
-    const typ=e.type==='DL'?'Demeure':'Maison';
-    html+=`<div class="ev ev-${e.type.toLowerCase()}${muted?' muted':''}">`
-        + `<span class="time">${timeFmt.format(e.date)}</span>`
-        + `<span class="chip">${typ} ${e.val}</span>`
-        + `<span class="sig">${sig||'—'}</span></div>`;
+    if(e.type==='ML'){
+      const cat=ML_CAT[e.val], fg=CAT_COLOR[cat][1];
+      html+=`<div class="ev ev-ml${muted?' muted':''}" style="--cat:${fg}">`
+          + `<span class="time">${timeFmt.format(e.date)}</span>`
+          + `<span class="chip" style="background:${fg}">Maison ${e.val} · <span class="cat">${cat}</span></span>`
+          + (sig ? `<span class="sig">${sig}</span>` : '') + `</div>`;
+    } else {
+      html+=`<div class="ev ev-dl${muted?' muted':''}">`
+          + `<span class="time">${timeFmt.format(e.date)}</span>`
+          + `<span class="chip">Demeure ${e.val}</span>`
+          + (sig ? `<span class="sig">${sig}</span>` : '') + `</div>`;
+    }
   }
   html+='</div>';
   $('#timeline').innerHTML = html;
